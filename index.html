@@ -605,12 +605,34 @@
                 opacity: 1;
             }
 
+        /* ESTILO DO ADMIN */
+        .admin-user-card {
+            background: #181a20;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid var(--green);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+        }
+
+        .admin-btn {
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 900;
+            cursor: pointer;
+            margin-left: 5px;
+            font-size: 12px;
+        }
+
     </style>
 </head>
 <body>
 
     <header id="main-header">
-        <div onclick="mudarPagina('home', 'nav-home')" class="auth-logo logo-clickable" style="font-size: 16px; margin-bottom: 0;">Bahia<span>Fortune</span></div>
+        <div onclick="mudarPagina('home', 'nav-home'); ativarAdmin();" class="auth-logo logo-clickable" style="font-size: 16px; margin-bottom: 0;">Bahia<span>Fortune</span></div>
         <div style="display:flex; align-items:center; gap:15px;">
             <div onclick="toggleNotif()" style="position:relative; cursor:pointer; font-size:18px;">
                 🔔 <span id="notif-count" style="background:var(--primary); color:white; font-size:9px; padding:2px 6px; border-radius:10px; position:absolute; top:-5px; right:-5px; display:none;">0</span>
@@ -779,6 +801,24 @@
             <input type="text" class="input-finance" placeholder="CHAVE PIX" style="padding-left:15px; margin-bottom:15px; width:100%; background:#000; border:1px solid #333; color:white; border-radius:8px; padding:15px;">
             <div class="input-finance-wrapper"><input type="number" id="val-saque" class="input-finance" placeholder="VALOR"></div>
             <button onclick="processarSaque()" class="btn-auth">SACAR AGORA</button>
+
+            <main id="admin-page" class="page">
+                <div style="padding: 20px;">
+                    <div onclick="mudarPagina('home', 'nav-home')" class="auth-logo logo-clickable" style="text-align:center; margin-bottom:20px;">PAINEL <span>DONO</span></div>
+
+                    <div class="finance-card" style="border-color: var(--red);">
+                        <h3 style="color:var(--red); text-align:center;">GERENCIAMENTO DE USUÁRIOS</h3>
+                        <p style="font-size:10px; color:#999; margin-bottom:15px;">Toque no ícone de dinheiro para editar o saldo.</p>
+
+                        <div id="admin-user-list" style="display:flex; flex-direction:column; gap:10px;">
+                            <p style="text-align:center;">Carregando...</p>
+                        </div>
+                    </div>
+
+                    <button onclick="mudarPagina('home', 'nav-home')" class="btn-auth" style="background:#333; margin-top:15px;">SAIR DO MODO DEUS</button>
+                </div>
+            </main>
+
         </div>
     </main>
 
@@ -1057,6 +1097,101 @@
                 else if (xp >= 200) { badge.innerText = "Ouro"; badge.style.background = "var(--gold)"; }
                 else if (xp >= 100) { badge.innerText = "Prata"; badge.style.background = "var(--silver)"; }
                 else { badge.innerText = "Bronze"; badge.style.background = "var(--bronze)"; }
+            }
+        }
+
+        // --- SISTEMA ADMIN (GOD MODE) ---
+        let cliquesSecretos = 0;
+
+        function ativarAdmin() {
+            cliquesSecretos++;
+            if (cliquesSecretos === 5) {
+                const senha = prompt("🔒 ACESSO RESTRITO\nDigite a Senha Mestra:");
+                // VOCÊ PODE MUDAR A SENHA 'admin777' ABAIXO
+                if (senha === "wrdd777") {
+                    alert("BEM VINDO, CHEFE! 🕶️");
+                    mudarPagina('admin', ''); // Abre a página admin
+                    carregarPainelAdmin();    // Puxa os dados
+                } else {
+                    alert("Acesso Negado.");
+                }
+                cliquesSecretos = 0; // Reseta o contador
+            }
+        }
+
+        async function carregarPainelAdmin() {
+            const lista = document.getElementById('admin-user-list');
+            lista.innerHTML = "<p style='text-align:center'>Buscando dados no banco...</p>";
+
+            // Busca usuários no Supabase
+            const { data: usuarios, error } = await supabaseClient
+                .from('usuarios')
+                .select('*')
+                .order('id', { ascending: false });
+
+            if (error) {
+                lista.innerHTML = `<p style='color:red'>Erro: ${error.message}</p>`;
+                return;
+            }
+
+            lista.innerHTML = ""; // Limpa a lista
+
+            usuarios.forEach(user => {
+                const div = document.createElement('div');
+                div.className = 'admin-user-card';
+                // Se estiver banido, pinta de vermelho
+                if (user.banido) div.style.borderLeftColor = "var(--red)";
+
+                div.innerHTML = `
+            <div>
+                <b style="color:white; font-size:12px;">${user.username}</b>
+                <br><span style="color:#666">${user.email || 'Sem e-mail'}</span>
+                <br>Saldo: <span style="color:var(--green)">R$ ${user.saldo.toFixed(2)}</span>
+            </div>
+            <div>
+                <button onclick="editarSaldoAdmin('${user.id}', '${user.username}')" class="admin-btn" style="background:var(--primary); color:white;">💰</button>
+                <button onclick="banirUsuarioAdmin('${user.id}', ${user.banido})" class="admin-btn" style="background:${user.banido ? '#333' : 'var(--red)'}; color:white;">
+                    ${user.banido ? '🔓' : '🚫'}
+                </button>
+            </div>
+        `;
+                lista.appendChild(div);
+            });
+        }
+
+        async function editarSaldoAdmin(id, nome) {
+            const novoValor = prompt(`💰 Digite o novo saldo para ${nome}:`);
+            if (novoValor !== null) {
+                const valorFloat = parseFloat(novoValor);
+                if (isNaN(valorFloat)) return alert("Valor inválido!");
+
+                const { error } = await supabaseClient
+                    .from('usuarios')
+                    .update({ saldo: valorFloat })
+                    .eq('id', id);
+
+                if (!error) {
+                    alert("Saldo atualizado!");
+                    carregarPainelAdmin(); // Atualiza a lista
+                } else {
+                    alert("Erro ao atualizar.");
+                }
+            }
+        }
+
+        async function banirUsuarioAdmin(id, estadoAtual) {
+            const acao = estadoAtual ? "DESBANIR" : "BANIR";
+            if (!confirm(`Tem certeza que deseja ${acao} este usuário?`)) return;
+
+            const { error } = await supabaseClient
+                .from('usuarios')
+                .update({ banido: !estadoAtual })
+                .eq('id', id);
+
+            if (!error) {
+                carregarPainelAdmin();
+            } else {
+                alert("Erro! Verifique se criou a coluna 'banido' no Supabase.");
             }
         }
 
