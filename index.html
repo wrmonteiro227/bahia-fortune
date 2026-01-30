@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BahiaFortuneBet - Oficial</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -18,7 +19,7 @@
             --font-main: 'Montserrat', sans-serif;
         }
 
-        /* RESET E SEGURANÇA */
+        /* --- BLINDAGEM DE INTERFACE --- */
         body {
             background-color: var(--bg);
             color: white;
@@ -28,18 +29,17 @@
             overflow-x: hidden;
         }
 
-        /* ESCONDER TODAS AS PÁGINAS POR PADRÃO - A "BLINDAGEM" */
         .page {
-            display: none !important;
+            display: none;
             width: 100%;
             box-sizing: border-box;
         }
 
             .page.active {
-                display: block !important;
+                display: block;
             }
 
-        /* TOAST NEON */
+        /* --- NOTIFICAÇÃO TOAST NEON --- */
         .toast-banca {
             position: fixed;
             top: 20px;
@@ -69,7 +69,7 @@
             }
         }
 
-        /* UI FIXA */
+        /* --- HEADER E NAV --- */
         #main-header {
             display: none;
             position: fixed;
@@ -109,7 +109,7 @@
                 color: var(--primary);
             }
 
-        /* COMPONENTES DE DESIGN */
+        /* --- DESIGN DE COMPONENTES --- */
         .auth-container {
             padding: 100px 20px 40px;
             text-align: center;
@@ -174,15 +174,16 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            text-align: center;
         }
 
         .finance-card {
             background: var(--card-bg);
             border-radius: 15px;
-            padding: 20px;
+            padding: 25px;
             margin: 15px;
-            border: 1px solid #333;
             text-align: center;
+            border: 1px solid #2d333c;
         }
 
         .val-opt {
@@ -198,6 +199,7 @@
                 border-color: var(--primary);
             }
 
+        /* --- LOADER E OVERLAY --- */
         #game-overlay {
             position: fixed;
             top: 0;
@@ -214,10 +216,10 @@
             border: 4px solid #f3f3f3;
             border-top: 4px solid var(--primary);
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
-            margin: 10px auto;
+            margin: 15px auto;
         }
 
         @keyframes spin {
@@ -236,7 +238,9 @@
     <header id="main-header">
         <div onclick="mudarPagina('home', 'nav-home')" class="auth-logo" style="font-size:18px; margin:0; cursor:pointer;">Bahia<span>Fortune</span></div>
         <div style="display:flex; align-items:center; gap:15px;">
-            <div style="background:#2b2f36; padding:5px 10px; border-radius:5px; border:1px solid var(--primary); font-size:12px; font-weight:900;">R$ <span class="saldo-dinamico">0.00</span></div>
+            <div style="background:#2b2f36; padding:5px 12px; border-radius:5px; border:1px solid var(--primary); font-size:12px; font-weight:900;">
+                R$ <span class="saldo-dinamico">0.00</span>
+            </div>
         </div>
     </header>
 
@@ -245,7 +249,7 @@
             <div class="auth-logo">Bahia<span>Fortune</span></div>
             <h2 id="auth-title" style="font-size:12px; color:var(--primary);">ACESSE SUA CONTA</h2>
             <div id="group-cadastro" style="display:none;">
-                <input type="text" id="reg-cpf" class="main-input" placeholder="CPF" oninput="mascaraCPF(this)" maxlength="14">
+                <input type="text" id="reg-cpf" class="main-input" placeholder="CPF" maxlength="14" oninput="mascaraCPF(this)">
                 <input type="email" id="reg-email" class="main-input" placeholder="E-mail">
             </div>
             <input type="text" id="reg-user" class="main-input" placeholder="Usuário">
@@ -259,7 +263,7 @@
         <div class="carousel-container">
             <div class="carousel-track" id="track">
                 <div class="banner" style="background:linear-gradient(45deg, #220011, #ff007f);"><h3>BÔNUS 100%</h3><p>CUPOM: BAHIA777</p></div>
-                <div class="banner" style="background:linear-gradient(45deg, #0b0e11, #4a00e0);"><h3>INDICAÇÃO</h3><p>GANHE R$ 5,00</p></div>
+                <div class="banner" style="background:linear-gradient(45deg, #0b0e11, #4a00e0);"><h3>INDICAR AMIGOS</h3><p>GANHE R$ 5,00</p></div>
                 <div class="banner" style="background:linear-gradient(45deg, #1e2329, #111);"><h3>BAHIA VIP</h3><p>VANTAGENS REAIS</p></div>
             </div>
         </div>
@@ -269,27 +273,29 @@
         </div>
     </main>
 
+    <main id="deposit-page" class="page">
+        <div class="finance-card" style="margin-top:80px;">
+            <h3 style="color:var(--green)">RECARGA PIX ⚡</h3>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
+                <div class="val-opt" onclick="setVal(10)">R$ 10</div>
+                <div class="val-opt" onclick="setVal(20)">R$ 20</div>
+                <div class="val-opt" onclick="setVal(50)">R$ 50</div>
+                <div class="val-opt" onclick="setVal(100)">R$ 100</div>
+            </div>
+            <input type="number" id="val-dep" class="main-input" placeholder="Outro Valor">
+            <button onclick="confirmarDep()" class="btn-auth" style="background:var(--green); color:black;">GERAR QR CODE</button>
+        </div>
+    </main>
+
     <main id="refer-page" class="page">
         <div class="finance-card" style="margin-top:80px;">
-            <h3 style="color:var(--primary)">INDICAR AMIGO</h3>
+            <h3 style="color:var(--primary)">CONVIDAR AMIGOS</h3>
             <div id="refer-link" style="background:#000; padding:15px; border-radius:8px; font-size:10px; color:var(--green); margin:15px 0; word-break:break-all;">...</div>
             <button onclick="copiarLink()" class="btn-auth" style="background:var(--green); color:black; padding:12px;">COPIAR LINK</button>
             <div style="margin-top:20px; border-top:1px solid #333; padding-top:15px;">
                 <p style="font-size:10px; color:var(--text-gray);">Amigos Indicados</p>
                 <h4 style="font-size:24px; color:var(--primary); margin:5px 0;">0</h4>
             </div>
-        </div>
-    </main>
-
-    <main id="deposit-page" class="page">
-        <div class="finance-card" style="margin-top:80px;">
-            <h3>DEPÓSITO PIX ⚡</h3>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
-                <div class="val-opt" onclick="setVal(10)">R$ 10</div>
-                <div class="val-opt" onclick="setVal(20)">R$ 20</div>
-            </div>
-            <input type="number" id="val-dep" class="main-input" placeholder="Outro Valor">
-            <button onclick="confirmarDep()" class="btn-auth" style="background:var(--green); color:black;">GERAR QR CODE</button>
         </div>
     </main>
 
@@ -321,7 +327,7 @@
             const g = document.getElementById('group-cadastro'); const b = document.getElementById('btn-auth-text');
             const tt = document.getElementById('toggle-text'); const at = document.getElementById('auth-title');
             if (modoAuth === 'login') {
-                modoAuth = 'cadastro'; g.style.display = 'block'; b.innerText = "Criar Conta";
+                modoAuth = 'cadastro'; g.style.display = 'block'; b.innerText = "Criar Minha Conta";
                 at.innerText = "CRIE SUA CONTA"; tt.innerHTML = 'Já tem conta? <span style="color:var(--primary); font-weight:900;">LOGIN</span>';
             } else {
                 modoAuth = 'login'; g.style.display = 'none'; b.innerText = "Entrar na Banca";
@@ -331,14 +337,15 @@
 
         async function processarAuth() {
             const u = document.getElementById('reg-user').value; const s = document.getElementById('reg-pass').value;
-            if (!u || s.length < 4) return notificarErro("Preencha corretamente!");
+            if (!u || s.length < 4) return notificarErro("Preencha os dados corretamente!");
+
             if (modoAuth === 'cadastro') {
                 const { error } = await supabaseClient.from('usuarios').insert([{ username: u, senha: s, saldo: 0 }]);
-                if (error) return notificarErro("Usuário em uso!");
-                notificarErro("Conta criada! Logue agora."); alternarAuth();
+                if (error) return notificarErro("Usuário já existe!");
+                notificarErro("Conta criada! Entre agora."); alternarAuth();
             } else {
                 const { data, error } = await supabaseClient.from('usuarios').select('*').eq('username', u).eq('senha', s).single();
-                if (error || !data) return notificarErro("Dados incorretos!");
+                if (error || !data) return notificarErro("Login ou senha incorretos!");
                 logarUsuario(data);
             }
         }
@@ -363,18 +370,32 @@
         }
 
         function abrirJogo(u) {
-            if (saldo <= 0) { notificarErro("Saldo insuficiente para jogar!"); mudarPagina('deposit', 'nav-dep'); return; }
+            if (saldo <= 0) { notificarErro("Saldo insuficiente! Deposite para jogar."); mudarPagina('deposit', 'nav-dep'); return; }
             document.getElementById('game-iframe').src = u;
             document.getElementById('game-overlay').style.display = 'flex';
         }
 
         function fecharJogo() { document.getElementById('game-overlay').style.display = 'none'; document.getElementById('game-iframe').src = ""; }
+
+        // --- SISTEMA DE PIX APROVADO ---
         function confirmarDep() {
             let v = document.getElementById('val-dep').value;
-            if (v < 10) return notificarErro("Mínimo R$ 10,00");
-            const modal = `<div id="pix-modal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:10000;display:flex;align-items:center;justify-content:center;"><div style="background:#1e2329;padding:30px;border-radius:15px;text-align:center;border:1px solid var(--primary);"><h3 style="color:var(--primary)">PAGAMENTO PIX</h3><div class="loader-pix"></div><p>Gerando código para R$ ${v}</p><button onclick="this.parentElement.parentElement.remove()" style="color:var(--red);background:none;border:none;cursor:pointer;font-weight:900;margin-top:10px;">FECHAR</button></div></div>`;
-            document.body.insertAdjacentHTML('beforeend', modal);
+            if (v < 10) return notificarErro("Depósito mínimo R$ 10,00");
+
+            const pixModal = `
+                    <div id="pix-modal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;">
+                        <div style="background:#1e2329;padding:30px;border-radius:20px;text-align:center;border:1px solid var(--primary);width:100%;max-width:320px;">
+                            <h3 style="color:var(--primary);margin-top:0;">PAGAMENTO PIX</h3>
+                            <p style="font-size:12px;color:var(--text-gray);">Valor: <b style="color:white;">R$ ${v}</b></p>
+                            <div class="loader-pix"></div>
+                            <p style="font-size:10px;color:var(--text-gray);">Aguardando QR Code da Efí...</p>
+                            <div style="background:#2b2f36;padding:10px;border-radius:5px;font-size:9px;color:var(--text-gray);margin:15px 0;">O código PIX aparecerá aqui para você copiar e pagar no seu banco.</div>
+                            <button onclick="this.parentElement.parentElement.remove()" style="color:var(--red);background:none;border:none;cursor:pointer;font-weight:900;font-size:12px;">CANCELAR PAGAMENTO</button>
+                        </div>
+                    </div>`;
+            document.body.insertAdjacentHTML('beforeend', pixModal);
         }
+
         function setVal(v) { document.getElementById('val-dep').value = v; }
         function copiarLink() { navigator.clipboard.writeText(document.getElementById('refer-link').innerText); notificarErro("Link Copiado!"); }
         function mascaraCPF(i) { let v = i.value.replace(/\D/g, ""); if (v.length <= 11) { v = v.replace(/(\d{3})(\d)/, "$1.$2"); v = v.replace(/(\d{3})(\d)/, "$1.$2"); v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2"); } i.value = v; }
