@@ -504,6 +504,27 @@
             justify-content: center;
             backdrop-filter: blur(5px);
         }
+
+        /* --- ANIMAÇÃO LOADER PIX --- */
+        .loader-pix {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 <body>
@@ -544,21 +565,9 @@
     <main id="home-page" class="page">
         <div class="carousel-container">
             <div class="carousel-track" id="track">
-                <div class="banner b1">
-                    <h2 style="font-size:18px; margin:0;">BÔNUS 100% ATIVO</h2>
-                    <p style="font-size:10px; margin:10px 0;">Use o cupom <b>BAHIA777</b></p>
-                    <button onclick="mudarPagina('deposit', 'nav-dep')" style="background:white; border:none; padding:8px 20px; border-radius:20px; font-weight:900; font-size:10px; cursor:pointer;">DEPOSITAR</button>
-                </div>
-                <div class="banner b2">
-                    <h2 style="font-size:18px; margin:0;">INDIQUE AMIGOS</h2>
-                    <p style="font-size:10px; margin:10px 0;">Ganhe R$ 5,00 por convite!</p>
-                    <button onclick="mudarPagina('refer', 'nav-prof')" style="background:var(--green); color:black; border:none; padding:8px 20px; border-radius:20px; font-weight:900; font-size:10px; cursor:pointer;">CONVIDAR</button>
-                </div>
-                <div class="banner b3">
-                    <h2 style="font-size:18px; margin:0; color:var(--primary);">BAHIA VIP</h2>
-                    <p style="font-size:10px; margin:10px 0;">Benefícios exclusivos todos os dias</p>
-                    <button onclick="mudarPagina('vip-benefits', 'nav-prof')" style="background:var(--primary); color:white; border:none; padding:8px 20px; border-radius:20px; font-weight:900; font-size:10px; cursor:pointer;">VER TABELA</button>
-                </div>
+                <div class="banner b1"><h2 style="font-size:18px; margin:0;">BÔNUS 100% ATIVO</h2><p style="font-size:10px; margin:10px 0;">Use o cupom <b>BAHIA777</b></p></div>
+                <div class="banner b2"><h2 style="font-size:18px; margin:0;">INDIQUE AMIGOS</h2><p style="font-size:10px; margin:10px 0;">Ganhe R$ 5,00 por convite!</p></div>
+                <div class="banner b3"><h2 style="font-size:18px; margin:0; color:var(--primary);">BAHIA VIP</h2><p style="font-size:10px; margin:10px 0;">Benefícios exclusivos todos os dias</p></div>
             </div>
             <div class="carousel-dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
         </div>
@@ -738,9 +747,53 @@
             }, 5000);
         }
 
-        function moveCarousel() { /* Removido para evitar duplicidade com o intervalo no logarUsuario */ }
         function updateGainBar() { if (!isLogged) return; document.getElementById('winner-name').innerText = names[Math.floor(Math.random() * names.length)]; document.getElementById('winner-val').innerText = (Math.random() * 150 + 20).toFixed(2); }
         setInterval(updateGainBar, 5000);
+
+        // --- NOVA FUNÇÃO DE DEPÓSITO COM CHECKOUT VISUAL ---
+        function confirmarDep() {
+            let v = parseFloat(document.getElementById('val-dep').value);
+            if (isNaN(v) || v < 10) return alert("Valor mínimo R$ 10,00");
+
+            const checkoutHTML = `
+                        <div id="pix-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10000; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(5px);">
+                            <div style="background:#1e2329; border:1px solid var(--primary); border-radius:20px; width:100%; max-width:350px; padding:30px; text-align:center; box-shadow: 0 0 20px rgba(255,0,127,0.2);">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                                    <span style="color:var(--primary); font-weight:900; font-size:14px;">PAGAMENTO SEGURO</span>
+                                    <span onclick="fecharCheckout()" style="cursor:pointer; font-size:20px; color:var(--text-gray);">&times;</span>
+                                </div>
+                                <p style="font-size:12px; color:var(--text-gray); margin-bottom:5px;">VALOR A PAGAR</p>
+                                <h2 style="margin:0; color:var(--green); font-size:28px;">R$ ${v.toFixed(2)}</h2>
+                                <div id="qr-area" style="background:white; width:180px; height:180px; margin:25px auto; border-radius:12px; display:flex; align-items:center; justify-content:center; padding:10px;">
+                                    <div style="text-align:center; color:#000;">
+                                        <div class="loader-pix"></div>
+                                        <p style="font-size:9px; font-weight:900; margin-top:10px;">GERANDO QR CODE...</p>
+                                    </div>
+                                </div>
+                                <button onclick="copiarPixReal()" style="width:100%; background:var(--primary); color:white; border:none; padding:15px; border-radius:10px; font-weight:900; font-size:13px; cursor:pointer; margin-bottom:15px;">COPIAR CÓDIGO PIX</button>
+                                <div style="display:flex; align-items:center; justify-content:center; gap:10px; color:var(--text-gray); font-size:11px;">
+                                    <span id="timer-pix">05:00</span>
+                                    <span>Aguardando pagamento...</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+            document.body.insertAdjacentHTML('beforeend', checkoutHTML);
+            iniciarTimerPix();
+        }
+
+        function fecharCheckout() { const m = document.getElementById('pix-modal'); if (m) m.remove(); }
+
+        function iniciarTimerPix() {
+            let tempo = 300; const d = document.getElementById('timer-pix');
+            const interval = setInterval(() => {
+                let min = Math.floor(tempo / 60); let sec = tempo % 60;
+                if (d) d.innerText = `${min < 10 ? '0' : ''}${min}:${sec < 10 ? '0' : ''}${sec}`;
+                if (--tempo < 0) { clearInterval(interval); if (d) d.innerText = "EXPIRADO"; }
+            }, 1000);
+        }
+
+        function copiarPixReal() { alert("Código PIX copiado! Pague no seu banco."); }
 
         function mudarPagina(id, navId) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -755,7 +808,6 @@
         function mascaraCPF(i) { let v = i.value.replace(/\D/g, ""); if (v.length <= 11) { v = v.replace(/(\d{3})(\d)/, "$1.$2"); v = v.replace(/(\d{3})(\d)/, "$1.$2"); v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2"); } i.value = v; }
         function setVal(el, v) { document.querySelectorAll('.val-opt').forEach(o => o.classList.remove('active')); el.classList.add('active'); document.getElementById('val-dep').value = v; }
         function atualizarS() { document.querySelectorAll('.saldo-dinamico').forEach(e => e.innerText = saldo.toFixed(2)); }
-        function confirmarDep() { let v = parseFloat(document.getElementById('val-dep').value); if (isNaN(v) || v < 10) return; saldo += v; atualizarS(); mudarPagina('home', 'nav-home'); }
         function processarSaque() { let v = parseFloat(document.getElementById('val-saque').value); if (v > saldo || v < 20) return alert("Erro no saque!"); saldo -= v; atualizarS(); }
         function atualizarVip() { const bar = document.getElementById('vip-progress'); const badge = document.getElementById('vip-badge'); let level = "Bronze"; if (xp >= 100) level = "Prata"; badge.innerText = level; bar.style.width = (xp % 100) + "%"; }
         function fecharBonus() { document.getElementById('bonus-modal').style.display = 'none'; }
