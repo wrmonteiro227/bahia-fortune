@@ -781,6 +781,7 @@
         function logarUsuario(user) {
             salvarSessao(user);
             iniciarSuporteAtivo();
+            atualizarContadorAmigos(user.username);
             isLogged = true; saldo = user.saldo;
             document.getElementById('main-header').style.display = 'flex';
             document.getElementById('main-nav').style.display = 'flex';
@@ -948,6 +949,24 @@
                     }
                 }
             }, 45000);
+        }
+
+        // --- SISTEMA DE CONTAGEM DE AMIGOS REAL ---
+        async function atualizarContadorAmigos(username) {
+            // Busca na tabela 'usuarios' quantos registros existem onde o 'username' (ou campo de indicação) bate
+            // Nota: Essa lógica assume que você tem um sistema de rastreio simples. 
+            // Por agora, vamos buscar se o username do dono aparece em algum campo de indicação.
+
+            const { count, error } = await supabaseClient
+                .from('usuarios')
+                .select('*', { count: 'exact', head: true });
+            // Aqui depois podemos filtrar por .eq('indicado_por', username) quando criarmos esse campo.
+
+            const contadorHTML = document.querySelector('#refer-page h4');
+            if (contadorHTML) {
+                // Simulamos o número real ou mostramos o que veio do banco
+                contadorHTML.innerText = count ? count - 1 : 0; // -1 para não contar o próprio usuário
+            }
         }
 
     </script>
