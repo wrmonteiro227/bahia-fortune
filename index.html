@@ -667,13 +667,23 @@
     <main id="refer-page" class="page">
         <div style="padding: 20px;">
             <div onclick="mudarPagina('home', 'nav-home')" class="auth-logo logo-clickable" style="text-align:center; margin-bottom:20px;">Bahia<span>Fortune</span></div>
-            <h3 style="color:var(--primary); text-align:center;">INDIQUE UM AMIGO</h3>
-            <div class="refer-card">
-                <p style="font-size: 12px;">Ganhe <b>R$ 5,00</b> por indicação!</p>
-                <div id="my-refer-link" style="background:#000; padding:15px; border-radius:8px; color:var(--green); font-size:10px; margin:15px 0; word-break:break-all;">...</div>
-                <button onclick="copiarLink()" class="btn-auth" style="background:var(--green); color:black;">COPIAR LINK</button>
+
+            <div class="finance-card">
+                <h3 style="color:var(--primary); text-align:center;">INDIQUE UM AMIGO</h3>
+                <p style="font-size: 12px; margin-bottom: 20px;">Ganhe <b>R$ 5,00</b> por cada novo cadastro!</p>
+
+                <div id="my-refer-link" style="background:#000; padding:15px; border-radius:8px; color:var(--green); font-size:10px; margin-bottom:15px; border:1px solid #333; word-break:break-all;">...</div>
+
+                <button onclick="copiarLink()" class="btn-auth" style="background:var(--green); color:black; margin-bottom: 25px;">COPIAR MEU LINK</button>
+
+                <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 12px; border: 1px dashed var(--primary);">
+                    <p style="font-size: 10px; color: var(--text-gray); text-transform: uppercase; margin: 0;">Amigos que entraram pelo seu link</p>
+                    <h4 style="font-size: 32px; color: var(--primary); margin: 10px 0;">0</h4>
+                    <p style="font-size: 9px; color: var(--green);">Bônus total acumulado: R$ 0,00</p>
+                </div>
             </div>
-            <button onclick="mudarPagina('profile', 'nav-prof')" class="btn-auth">VOLTAR AO PERFIL</button>
+
+            <button onclick="mudarPagina('profile', 'nav-prof')" class="btn-auth" style="background: transparent; border: 1px solid #333; margin-top: 15px;">VOLTAR AO PERFIL</button>
         </div>
     </main>
 
