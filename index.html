@@ -1115,22 +1115,21 @@
             }
         }
 
-        // --- SISTEMA ADMIN (GOD MODE) ---
+        // --- SISTEMA ADMIN (GOD MODE) - VERSÃO CORRIGIDA ---
         let cliquesSecretos = 0;
 
         function ativarAdmin() {
             cliquesSecretos++;
             if (cliquesSecretos === 5) {
                 const senha = prompt("🔒 ACESSO RESTRITO\nDigite a Senha Mestra:");
-                // VOCÊ PODE MUDAR A SENHA 'admin777' ABAIXO
-                if (senha === "wrdd777") {
+                if (senha === "wrdd777") { // SUA SENHA
                     alert("BEM VINDO, CHEFE! 🕶️");
-                    mudarPagina('admin', ''); // Abre a página admin
-                    carregarPainelAdmin();    // Puxa os dados
+                    mudarPagina('admin', '');
+                    carregarPainelAdmin();
                 } else {
                     alert("Acesso Negado.");
                 }
-                cliquesSecretos = 0; // Reseta o contador
+                cliquesSecretos = 0;
             }
         }
 
@@ -1138,25 +1137,26 @@
             const lista = document.getElementById('admin-user-list');
             lista.innerHTML = "<p style='text-align:center'>Buscando dados no banco...</p>";
 
-            // Busca usuários no Supabase
+            // CORREÇÃO: Ordena por 'saldo' para evitar erro de 'id'
             const { data: usuarios, error } = await supabaseClient
                 .from('usuarios')
                 .select('*')
-                .order('id', { ascending: false });
+                .order('saldo', { ascending: false });
 
             if (error) {
-                lista.innerHTML = `<p style='color:red'>Erro: ${error.message}</p>`;
+                lista.innerHTML = `<p style='color:red; font-size:10px;'>Erro: ${error.message}</p>`;
                 return;
             }
 
-            lista.innerHTML = ""; // Limpa a lista
+            lista.innerHTML = "";
 
             usuarios.forEach(user => {
                 const div = document.createElement('div');
                 div.className = 'admin-user-card';
-                // Se estiver banido, pinta de vermelho
+                // Pinta de vermelho se estiver banido
                 if (user.banido) div.style.borderLeftColor = "var(--red)";
 
+                // CORREÇÃO: Funções agora usam (user.username)
                 div.innerHTML = `
                 <div>
                     <b style="color:white; font-size:12px;">${user.username}</b>
@@ -1164,8 +1164,8 @@
                     <br>Saldo: <span style="color:var(--green)">R$ ${user.saldo.toFixed(2)}</span>
                 </div>
                 <div>
-                    <button onclick="editarSaldoAdmin('${user.id}', '${user.username}')" class="admin-btn" style="background:var(--primary); color:white;">💰</button>
-                    <button onclick="banirUsuarioAdmin('${user.id}', ${user.banido})" class="admin-btn" style="background:${user.banido ? '#333' : 'var(--red)'}; color:white;">
+                    <button onclick="editarSaldoAdmin('${user.username}')" class="admin-btn" style="background:var(--primary); color:white;">💰</button>
+                    <button onclick="banirUsuarioAdmin('${user.username}', ${user.banido})" class="admin-btn" style="background:${user.banido ? '#333' : 'var(--red)'}; color:white;">
                         ${user.banido ? '🔓' : '🚫'}
                     </button>
                 </div>
@@ -1174,39 +1174,41 @@
             });
         }
 
-        async function editarSaldoAdmin(id, nome) {
-            const novoValor = prompt(`💰 Digite o novo saldo para ${nome}:`);
+        async function editarSaldoAdmin(username) {
+            const novoValor = prompt(`💰 Digite o novo saldo para ${username}:`);
             if (novoValor !== null) {
                 const valorFloat = parseFloat(novoValor);
                 if (isNaN(valorFloat)) return alert("Valor inválido!");
 
+                // CORREÇÃO: Atualiza buscando pelo username
                 const { error } = await supabaseClient
                     .from('usuarios')
                     .update({ saldo: valorFloat })
-                    .eq('id', id);
+                    .eq('username', username);
 
                 if (!error) {
                     alert("Saldo atualizado!");
-                    carregarPainelAdmin(); // Atualiza a lista
+                    carregarPainelAdmin(); // Atualiza a lista na hora
                 } else {
-                    alert("Erro ao atualizar.");
+                    alert("Erro ao atualizar. Verifique a conexão.");
                 }
             }
         }
 
-        async function banirUsuarioAdmin(id, estadoAtual) {
+        async function banirUsuarioAdmin(username, estadoAtual) {
             const acao = estadoAtual ? "DESBANIR" : "BANIR";
-            if (!confirm(`Tem certeza que deseja ${acao} este usuário?`)) return;
+            if (!confirm(`Tem certeza que deseja ${acao} o usuário ${username}?`)) return;
 
+            // CORREÇÃO: Atualiza buscando pelo username
             const { error } = await supabaseClient
                 .from('usuarios')
                 .update({ banido: !estadoAtual })
-                .eq('id', id);
+                .eq('username', username);
 
             if (!error) {
                 carregarPainelAdmin();
             } else {
-                alert("Erro! Verifique se criou a coluna 'banido' no Supabase.");
+                alert("Erro! Verifique se você criou a coluna 'banido' no Supabase.");
             }
         }
 
