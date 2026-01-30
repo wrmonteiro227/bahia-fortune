@@ -707,7 +707,7 @@
                 </div>
             </div>
 
-            </div>
+        </div>
         </div>
         <footer><div class="badge-18">18+</div><p style="font-size:9px;">BahiaFortuneBet © 2026.</p></footer>
     </main>
@@ -801,24 +801,23 @@
             <input type="text" class="input-finance" placeholder="CHAVE PIX" style="padding-left:15px; margin-bottom:15px; width:100%; background:#000; border:1px solid #333; color:white; border-radius:8px; padding:15px;">
             <div class="input-finance-wrapper"><input type="number" id="val-saque" class="input-finance" placeholder="VALOR"></div>
             <button onclick="processarSaque()" class="btn-auth">SACAR AGORA</button>
+        </div>
+    </main>
 
-            <main id="admin-page" class="page">
-                <div style="padding: 20px;">
-                    <div onclick="mudarPagina('home', 'nav-home')" class="auth-logo logo-clickable" style="text-align:center; margin-bottom:20px;">PAINEL <span>DONO</span></div>
+    <main id="admin-page" class="page">
+        <div style="padding: 20px;">
+            <div onclick="mudarPagina('home', 'nav-home')" class="auth-logo logo-clickable" style="text-align:center; margin-bottom:20px;">PAINEL <span>DONO</span></div>
 
-                    <div class="finance-card" style="border-color: var(--red);">
-                        <h3 style="color:var(--red); text-align:center;">GERENCIAMENTO DE USUÁRIOS</h3>
-                        <p style="font-size:10px; color:#999; margin-bottom:15px;">Toque no ícone de dinheiro para editar o saldo.</p>
+            <div class="finance-card" style="border-color: var(--red);">
+                <h3 style="color:var(--red); text-align:center;">GERENCIAMENTO DE USUÁRIOS</h3>
+                <p style="font-size:10px; color:#999; margin-bottom:15px;">Toque no ícone de dinheiro para editar o saldo.</p>
 
-                        <div id="admin-user-list" style="display:flex; flex-direction:column; gap:10px;">
-                            <p style="text-align:center;">Carregando...</p>
-                        </div>
-                    </div>
-
-                    <button onclick="mudarPagina('home', 'nav-home')" class="btn-auth" style="background:#333; margin-top:15px;">SAIR DO MODO DEUS</button>
+                <div id="admin-user-list" style="display:flex; flex-direction:column; gap:10px;">
+                    <p style="text-align:center;">Carregando usuários...</p>
                 </div>
-            </main>
+            </div>
 
+            <button onclick="mudarPagina('home', 'nav-home')" class="btn-auth" style="background:#333; margin-top:15px;">SAIR DO MODO DEUS</button>
         </div>
     </main>
 
@@ -864,32 +863,48 @@
             setTimeout(() => toast.remove(), 3000);
         }
 
-        function alternarAuth() {
-            const t = document.getElementById('auth-title'); const b = document.getElementById('btn-auth-main'); const tx = document.getElementById('toggle-auth');
-            const c = document.getElementById('group-cpf'); const e = document.getElementById('group-email');
-            if (modoAuth === 'login') {
-                modoAuth = 'cadastro'; t.innerText = "CRIE SUA CONTA"; b.innerText = "Finalizar Cadastro";
-                tx.innerHTML = 'Já tem conta? <span style="color: var(--primary); font-weight: 900;">FAÇA LOGIN</span>';
-                c.style.display = 'block'; e.style.display = 'block';
-            } else {
-                modoAuth = 'login'; t.innerText = "ACESSE SUA CONTA"; b.innerText = "Entrar na Banca";
-                tx.innerHTML = 'Não tem conta? <span style="color: var(--primary); font-weight: 900;">CADASTRE-SE AQUI</span>';
-                c.style.display = 'none'; e.style.display = 'none';
-            }
-        }
-
+        // --- FUNÇÃO DE LOGIN E CADASTRO (COM TRAVA DE BANIMENTO) ---
         async function processarAuth() {
-            const u = document.getElementById('reg-user').value; const s = document.getElementById('reg-pass').value;
+            const u = document.getElementById('reg-user').value;
+            const s = document.getElementById('reg-pass').value;
+
             if (!u || s.length < 4) return notificarErro("Preencha usuário e senha!");
+
             if (modoAuth === 'cadastro') {
-                const e = document.getElementById('reg-email').value; const c = document.getElementById('reg-cpf').value;
+                // --- LÓGICA DE CADASTRO ---
+                const e = document.getElementById('reg-email').value;
+                const c = document.getElementById('reg-cpf').value;
+
                 if (!e.includes('@')) return notificarErro("Email inválido!");
-                const { error } = await supabaseClient.from('usuarios').insert([{ username: u, email: e, cpf: c, senha: s, saldo: 0 }]);
-                if (error) return notificarErro("Erro no Cadastro.");
-                notificarErro("Sucesso! Logue agora."); alternarAuth();
+
+                // Cria usuário já com banido = false
+                const { error } = await supabaseClient
+                    .from('usuarios')
+                    .insert([{ username: u, email: e, cpf: c, senha: s, saldo: 0, banido: false }]);
+
+                if (error) return notificarErro("Erro no Cadastro (Usuário já existe?)");
+
+                notificarErro("Sucesso! Logue agora.");
+                alternarAuth();
+
             } else {
-                const { data, error } = await supabaseClient.from('usuarios').select('*').eq('username', u).eq('senha', s).single();
+                // --- LÓGICA DE LOGIN ---
+                const { data, error } = await supabaseClient
+                    .from('usuarios')
+                    .select('*')
+                    .eq('username', u)
+                    .eq('senha', s)
+                    .single();
+
                 if (error || !data) return notificarErro("Login incorreto!");
+
+                // 🔒 AQUI ESTÁ A TRAVA DE SEGURANÇA 🔒
+                if (data.banido === true) {
+                    alert("🚫 ACESSO NEGADO\n\nSua conta foi suspensa pela administração.\nEntre em contato com o suporte.");
+                    return; // O código para aqui e não deixa entrar
+                }
+
+                // Se não estiver banido, entra normal
                 logarUsuario(data);
             }
         }
@@ -947,28 +962,28 @@
             if (isNaN(v) || v < 10) return notificarErro("Mínimo R$ 10,00");
 
             const checkoutHTML = `
-                    <div id="pix-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10000; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(5px);">
-                        <div style="background:#1e2329; border:1px solid var(--primary); border-radius:20px; width:100%; max-width:350px; padding:30px; text-align:center; box-shadow: 0 0 20px rgba(255,0,127,0.2);">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                                <span style="color:var(--primary); font-weight:900; font-size:14px;">PAGAMENTO SEGURO</span>
-                                <span onclick="fecharCheckout()" style="cursor:pointer; font-size:20px; color:var(--text-gray);">&times;</span>
-                            </div>
-                            <p style="font-size:12px; color:var(--text-gray); margin-bottom:5px;">VALOR A PAGAR</p>
-                            <h2 style="margin:0; color:var(--green); font-size:28px;">R$ ${v.toFixed(2)}</h2>
-                            <div id="qr-area" style="background:white; width:180px; height:180px; margin:25px auto; border-radius:12px; display:flex; align-items:center; justify-content:center; padding:10px;">
-                                <div style="text-align:center; color:#000;">
-                                    <div class="loader-pix"></div>
-                                    <p style="font-size:9px; font-weight:900; margin-top:10px;">GERANDO QR CODE...</p>
+                        <div id="pix-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10000; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(5px);">
+                            <div style="background:#1e2329; border:1px solid var(--primary); border-radius:20px; width:100%; max-width:350px; padding:30px; text-align:center; box-shadow: 0 0 20px rgba(255,0,127,0.2);">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                                    <span style="color:var(--primary); font-weight:900; font-size:14px;">PAGAMENTO SEGURO</span>
+                                    <span onclick="fecharCheckout()" style="cursor:pointer; font-size:20px; color:var(--text-gray);">&times;</span>
+                                </div>
+                                <p style="font-size:12px; color:var(--text-gray); margin-bottom:5px;">VALOR A PAGAR</p>
+                                <h2 style="margin:0; color:var(--green); font-size:28px;">R$ ${v.toFixed(2)}</h2>
+                                <div id="qr-area" style="background:white; width:180px; height:180px; margin:25px auto; border-radius:12px; display:flex; align-items:center; justify-content:center; padding:10px;">
+                                    <div style="text-align:center; color:#000;">
+                                        <div class="loader-pix"></div>
+                                        <p style="font-size:9px; font-weight:900; margin-top:10px;">GERANDO QR CODE...</p>
+                                    </div>
+                                </div>
+                                <button onclick="copiarPixReal()" style="width:100%; background:var(--primary); color:white; border:none; padding:15px; border-radius:10px; font-weight:900; font-size:13px; cursor:pointer; margin-bottom:15px;">COPIAR CÓDIGO PIX</button>
+                                <div style="display:flex; align-items:center; justify-content:center; gap:10px; color:var(--text-gray); font-size:11px;">
+                                    <span id="timer-pix">05:00</span>
+                                    <span>Aguardando pagamento...</span>
                                 </div>
                             </div>
-                            <button onclick="copiarPixReal()" style="width:100%; background:var(--primary); color:white; border:none; padding:15px; border-radius:10px; font-weight:900; font-size:13px; cursor:pointer; margin-bottom:15px;">COPIAR CÓDIGO PIX</button>
-                            <div style="display:flex; align-items:center; justify-content:center; gap:10px; color:var(--text-gray); font-size:11px;">
-                                <span id="timer-pix">05:00</span>
-                                <span>Aguardando pagamento...</span>
-                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
             document.body.insertAdjacentHTML('beforeend', checkoutHTML);
             iniciarTimerPix();
         }
@@ -1072,7 +1087,7 @@
         // --- SISTEMA DE CONTAGEM DE AMIGOS REAL ---
         async function atualizarContadorAmigos(username) {
             // Busca na tabela 'usuarios' quantos registros existem onde o 'username' (ou campo de indicação) bate
-            // Nota: Essa lógica assume que você tem um sistema de rastreio simples. 
+            // Nota: Essa lógica assume que você tem um sistema de rastreio simples.
             // Por agora, vamos buscar se o username do dono aparece em algum campo de indicação.
 
             const { count, error } = await supabaseClient
@@ -1143,18 +1158,18 @@
                 if (user.banido) div.style.borderLeftColor = "var(--red)";
 
                 div.innerHTML = `
-            <div>
-                <b style="color:white; font-size:12px;">${user.username}</b>
-                <br><span style="color:#666">${user.email || 'Sem e-mail'}</span>
-                <br>Saldo: <span style="color:var(--green)">R$ ${user.saldo.toFixed(2)}</span>
-            </div>
-            <div>
-                <button onclick="editarSaldoAdmin('${user.id}', '${user.username}')" class="admin-btn" style="background:var(--primary); color:white;">💰</button>
-                <button onclick="banirUsuarioAdmin('${user.id}', ${user.banido})" class="admin-btn" style="background:${user.banido ? '#333' : 'var(--red)'}; color:white;">
-                    ${user.banido ? '🔓' : '🚫'}
-                </button>
-            </div>
-        `;
+                <div>
+                    <b style="color:white; font-size:12px;">${user.username}</b>
+                    <br><span style="color:#666">${user.email || 'Sem e-mail'}</span>
+                    <br>Saldo: <span style="color:var(--green)">R$ ${user.saldo.toFixed(2)}</span>
+                </div>
+                <div>
+                    <button onclick="editarSaldoAdmin('${user.id}', '${user.username}')" class="admin-btn" style="background:var(--primary); color:white;">💰</button>
+                    <button onclick="banirUsuarioAdmin('${user.id}', ${user.banido})" class="admin-btn" style="background:${user.banido ? '#333' : 'var(--red)'}; color:white;">
+                        ${user.banido ? '🔓' : '🚫'}
+                    </button>
+                </div>
+            `;
                 lista.appendChild(div);
             });
         }
