@@ -568,6 +568,43 @@
                 transform: rotate(360deg);
             }
         }
+
+        .game-card {
+            cursor: pointer;
+            position: relative;
+            border: 1px solid #333;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: 0.3s;
+            background: var(--card-bg);
+        }
+
+            .game-card:active {
+                transform: scale(0.95);
+                filter: brightness(1.2);
+            }
+
+            .game-card::after {
+                content: 'JOGAR';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: var(--primary);
+                color: white;
+                padding: 5px 15px;
+                border-radius: 4px;
+                font-size: 10px;
+                font-weight: 900;
+                opacity: 0;
+                transition: 0.3s;
+                z-index: 2;
+            }
+
+            .game-card:hover::after {
+                opacity: 1;
+            }
+
     </style>
 </head>
 <body>
@@ -617,9 +654,32 @@
 
         <div class="gain-bar"><div class="gain-content"><span style="color:var(--primary)">●</span> <span id="winner-name">...</span> ganhou <span style="color:var(--green)">R$ <span id="winner-val">0.00</span></span> no Mines</div></div>
 
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; padding:15px;">
-            <div class="game-card" onclick="abrirJogo('https://demo.spribe.io/launch/mines')" style="background:var(--card-bg); border-radius:10px; overflow:hidden; border:1px solid #333;"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0Nn9L-k2n9y633364OQvH9W2O8Xk0z0B8Yg&s" style="width:100%;"><div style="padding:8px; text-align:center; font-size:10px; font-weight:900;">MINES</div></div>
-            <div class="game-card" onclick="abrirJogo('https://demo.spribe.io/launch/plinko')" style="background:var(--card-bg); border-radius:10px; overflow:hidden; border:1px solid #333;"><img src="https://image.winudf.com/v2/image1/Y29tLnNwcmliZS5wbGlua29faWNvbl8xNjY4NTY2OTI1XzA0MA/icon.png?w=184&fakeurl=1" style="width:100%;"><div style="padding:8px; text-align:center; font-size:10px; font-weight:900;">PLINKO</div></div>
+        <div style="padding: 15px;">
+            <h3 style="color:var(--primary); font-size: 14px; margin-bottom: 15px; text-transform: uppercase; font-weight: 900;">🔥 Jogos em Alta</h3>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+
+                <div class="game-card" onclick="abrirJogo('https://demo.pgsoft.com/fortune-tiger')">
+                    <img src="https://img.freepik.com/premium-vector/fortune-tiger-mascot-logo-design_105238-422.jpg" style="width:100%; height:110px; object-fit:cover;">
+                    <div style="padding:8px; text-align:center; font-size:10px; font-weight:900;">FORTUNE TIGER</div>
+                </div>
+
+                <div class="game-card" onclick="abrirJogo('https://demo.pgsoft.com/fortune-ox')">
+                    <img src="https://static.vecteezy.com/system/resources/previews/007/541/722/non_2x/golden-ox-mascot-logo-free-vector.jpg" style="width:100%; height:110px; object-fit:cover;">
+                    <div style="padding:8px; text-align:center; font-size:10px; font-weight:900;">FORTUNE OX</div>
+                </div>
+
+                <div class="game-card" onclick="abrirJogo('https://demo.pgsoft.com/fortune-rabbit')">
+                    <img src="https://img.freepik.com/premium-vector/rabbit-mascot-logo-design-vector_490515-188.jpg" style="width:100%; height:110px; object-fit:cover;">
+                    <div style="padding:8px; text-align:center; font-size:10px; font-weight:900;">FORTUNE RABBIT</div>
+                </div>
+
+                <div class="game-card" onclick="abrirJogo('https://demo.pgsoft.com/cash-mania')">
+                    <img src="https://img.freepik.com/free-vector/money-bag-stack-coins-cartoon_1308-112220.jpg" style="width:100%; height:110px; object-fit:cover;">
+                    <div style="padding:8px; text-align:center; font-size:10px; font-weight:900;">CASH MANIA</div>
+                </div>
+
+            </div>
         </div>
         <footer><div class="badge-18">18+</div><p style="font-size:9px;">BahiaFortuneBet © 2026.</p></footer>
     </main>
@@ -792,6 +852,8 @@
             salvarSessao(user);
             iniciarSuporteAtivo();
             atualizarContadorAmigos(user.username);
+            xp = user.xp || 0;
+            ganharXP(0);
             isLogged = true; saldo = user.saldo;
             document.getElementById('main-header').style.display = 'flex';
             document.getElementById('main-nav').style.display = 'flex';
@@ -976,6 +1038,19 @@
             if (contadorHTML) {
                 // Simulamos o número real ou mostramos o que veio do banco
                 contadorHTML.innerText = count ? count - 1 : 0; // -1 para não contar o próprio usuário
+            }
+        }
+
+        function ganharXP(quantidade) {
+            xp += quantidade;
+            const barra = document.getElementById('vip-progress');
+            const badge = document.getElementById('vip-badge');
+            if (barra) barra.style.width = (xp % 100) + "%";
+            if (badge) {
+                if (xp >= 300) { badge.innerText = "Bahia VIP"; badge.style.background = "var(--primary)"; }
+                else if (xp >= 200) { badge.innerText = "Ouro"; badge.style.background = "var(--gold)"; }
+                else if (xp >= 100) { badge.innerText = "Prata"; badge.style.background = "var(--silver)"; }
+                else { badge.innerText = "Bronze"; badge.style.background = "var(--bronze)"; }
             }
         }
 
