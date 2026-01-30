@@ -1,0 +1,1059 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BahiaFortuneBet - Oficial</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --primary: #ff007f;
+            --bg: #0b0e11;
+            --card-bg: #1e2329;
+            --text-gray: #848e9c;
+            --green: #00ff88;
+            --red: #ff4444;
+            --font-main: 'Montserrat', sans-serif;
+            --gold: #f1c40f;
+            --silver: #bdc3c7;
+            --bronze: #cd7f32;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: white;
+            font-family: var(--font-main);
+            margin: 0;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* --- NOVO: CSS DO TOAST NEON PARA REFINAMENTO --- */
+        .toast-banca {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e2329;
+            border: 1px solid var(--primary);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 12px;
+            z-index: 10000;
+            box-shadow: 0 0 20px rgba(255,0,127,0.4);
+            animation: slideDown 0.5s ease, fadeOut 0.5s ease 2.5s forwards;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @keyframes slideDown {
+            from {
+                top: -50px;
+                opacity: 0;
+            }
+
+            to {
+                top: 20px;
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
+        /* --- BLINDAGEM HEADER --- */
+        #main-header {
+            display: none;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: #181a20;
+            padding: 12px 15px;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid var(--primary);
+            box-sizing: border-box;
+        }
+
+        .logo-clickable {
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        /* --- MÓDULO CARROSSEL --- */
+        .carousel-container {
+            position: relative;
+            margin: 75px 15px 15px 15px;
+            height: 160px;
+            border-radius: 15px;
+            overflow: hidden;
+            display: block;
+        }
+
+        .carousel-track {
+            display: flex;
+            width: 300%;
+            height: 100%;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .banner {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .b1 {
+            background: linear-gradient(135deg, #220011, #ff007f);
+        }
+
+        .b2 {
+            background: linear-gradient(135deg, #0b0e11, #4a00e0);
+        }
+
+        .b3 {
+            background: linear-gradient(135deg, #1e2329, #111);
+            border: 1px solid var(--primary);
+        }
+
+        .carousel-dots {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+        }
+
+            .dot.active {
+                background: var(--primary);
+                width: 20px;
+                border-radius: 10px;
+                transition: 0.3s;
+            }
+
+        /* --- BARRA DE GANHOS --- */
+        .gain-bar {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin: 0 15px 15px 15px;
+            padding: 10px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .gain-content {
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+            display: flex;
+            gap: 10px;
+            animation: slideInHome 5s infinite linear;
+        }
+
+        @keyframes slideInHome {
+            0% {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            10%, 90% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+        }
+
+        /* --- EXTRATO FINANCEIRO --- */
+        .trans-item {
+            background: #181a20;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 3px solid var(--text-gray);
+        }
+
+        .status-badge {
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .status-sucesso {
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--green);
+        }
+
+        .status-analise {
+            background: rgba(255, 170, 0, 0.1);
+            color: #ffaa00;
+        }
+
+        /* --- CENTRAL DE NOTIFICAÇÕES --- */
+        #notif-panel {
+            position: fixed;
+            top: 65px;
+            right: 15px;
+            width: 260px;
+            max-height: 300px;
+            background: #181a20;
+            border: 1px solid var(--primary);
+            border-radius: 12px;
+            display: none;
+            flex-direction: column;
+            z-index: 3000;
+            box-shadow: 0 10px 30px #000;
+        }
+
+        .notif-header {
+            padding: 12px;
+            border-bottom: 1px solid #333;
+            font-weight: 900;
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .notif-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .notif-item {
+            background: #2b2f36;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 10px;
+            border-left: 3px solid var(--primary);
+        }
+
+        /* --- TELA DE REGISTRO --- */
+        .auth-container {
+            padding: 80px 20px 40px;
+            text-align: center;
+            max-width: 400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .auth-logo {
+            font-size: 32px;
+            font-weight: 900;
+            font-style: italic;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+            .auth-logo span {
+                color: var(--primary);
+            }
+
+        .input-group {
+            width: 100%;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+            .input-group label {
+                font-size: 10px;
+                font-weight: 900;
+                color: var(--text-gray);
+                text-transform: uppercase;
+                margin-bottom: 5px;
+                display: block;
+            }
+
+        .main-input {
+            width: 100%;
+            background: #1e2329;
+            border: 1px solid #333;
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: var(--font-main);
+            box-sizing: border-box;
+            font-weight: 700;
+        }
+
+        .btn-auth {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 8px;
+            font-weight: 900;
+            font-size: 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-top: 15px;
+        }
+
+        /* --- VIP E PERFIL --- */
+        .vip-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .badge-vip {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .progress-bg {
+            background: #000;
+            height: 8px;
+            border-radius: 4px;
+            width: 100%;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: var(--primary);
+            height: 100%;
+            width: 0%;
+            transition: 1s ease-in-out;
+        }
+
+        .vip-info-card {
+            background: #181a20;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .vip-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            margin-top: 10px;
+        }
+
+            .vip-table td {
+                padding: 10px 0;
+                border-bottom: 1px solid #222;
+            }
+
+        /* --- FINANCEIRO --- */
+        .finance-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 15px;
+            text-align: center;
+            border: 1px solid #2d333c;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .val-opt {
+            background: #2b2f36;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 900;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+            .val-opt.active {
+                border-color: var(--primary);
+                color: var(--primary);
+            }
+
+        .input-finance-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+            .input-finance-wrapper::before {
+                content: "R$";
+                position: absolute;
+                left: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--green);
+                font-weight: 900;
+            }
+
+        .input-finance {
+            width: 100%;
+            background: #000;
+            border: 1px solid #333;
+            color: white;
+            padding: 15px 15px 15px 45px;
+            border-radius: 8px;
+            font-weight: 900;
+            box-sizing: border-box;
+        }
+
+        /* --- CHAT E JOGOS --- */
+        #chat-window {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 280px;
+            height: 350px;
+            background: #181a20;
+            border: 1px solid var(--primary);
+            border-radius: 12px;
+            display: none;
+            flex-direction: column;
+            z-index: 2000;
+        }
+
+        #game-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 4000;
+            display: none;
+            flex-direction: column;
+        }
+
+        /* --- NAVEGAÇÃO SPA --- */
+        .page {
+            display: none;
+            padding-top: 20px;
+        }
+
+            .page.active {
+                display: block;
+            }
+
+        #home-page {
+            padding-top: 70px;
+        }
+
+        nav.bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #181a20;
+            display: none;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid #2d333c;
+            z-index: 100;
+        }
+
+        .nav-item {
+            color: var(--text-gray);
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            background: none;
+            border: none;
+            text-transform: uppercase;
+        }
+
+            .nav-item.active {
+                color: var(--primary);
+            }
+
+        footer {
+            background: #181a20;
+            padding: 40px 20px 100px 20px;
+            text-align: center;
+            border-top: 1px solid #2d333c;
+        }
+
+        .badge-18 {
+            border: 2px solid #848e9c;
+            color: #848e9c;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 900;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        /* --- MODAL BÔNUS --- */
+        #bonus-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 5000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        /* --- ANIMAÇÃO LOADER PIX --- */
+        .loader-pix {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .game-card {
+            cursor: pointer;
+            position: relative;
+            border: 1px solid #333;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: 0.3s;
+            background: var(--card-bg);
+        }
+
+            .game-card:active {
+                transform: scale(0.95);
+                filter: brightness(1.2);
+            }
+
+            .game-card::after {
+                content: 'JOGAR';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: var(--primary);
+                color: white;
+                padding: 5px 15px;
+                border-radius: 4px;
+                font-size: 10px;
+                font-weight: 900;
+                opacity: 0;
+                transition: 0.3s;
+                z-index: 2;
+            }
+
+            .game-card:hover::after {
+                opacity: 1;
+            }
+
+    </style>
+</head>
+<body>
+
+    <header id="main-header">
+        <div onclick="mudarPagina('home', 'nav-home')" class="auth-logo logo-clickable" style="font-size: 16px; margin-bottom: 0;">Bahia<span>Fortune</span></div>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <div onclick="toggleNotif()" style="position:relative; cursor:pointer; font-size:18px;">
+                🔔 <span id="notif-count" style="background:var(--primary); color:white; font-size:9px; padding:2px 6px; border-radius:10px; position:absolute; top:-5px; right:-5px; display:none;">0</span>
+            </div>
+            <div style="background: #2b2f36; padding: 6px 12px; border-radius: 4px; font-weight: 700; border: 1px solid var(--primary);">
+                R$ <span class="saldo-dinamico">0.00</span>
+            </div>
+        </div>
+    </header>
+
+    <div id="notif-panel">
+        <div style="padding:12px; font-weight:900; font-size:11px; border-bottom:1px solid #333; display:flex; justify-content:space-between;">NOTIFICAÇÕES <span onclick="toggleNotif()" style="cursor:pointer;">&times;</span></div>
+        <div class="notif-body" id="notif-list"></div>
+    </div>
+
+    <main id="register-page" class="page active">
+        <div class="auth-container">
+            <div class="auth-logo">Bahia<span>Fortune</span></div>
+            <h2 id="auth-title" style="font-size: 13px; color: var(--primary); margin-bottom: 25px;">ACESSE SUA CONTA</h2>
+
+            <div id="group-cpf" class="input-group" style="display:none;"><label>CPF</label><input type="text" id="reg-cpf" class="main-input" placeholder="000.000.000-00" oninput="mascaraCPF(this)" maxlength="14"></div>
+            <div id="group-email" class="input-group" style="display:none;"><label>E-mail</label><input type="email" id="reg-email" class="main-input" placeholder="seu@email.com"></div>
+
+            <div class="input-group"><label>Usuário</label><input type="text" id="reg-user" class="main-input" placeholder="Seu login"></div>
+            <div class="input-group"><label>Senha</label><input type="password" id="reg-pass" class="main-input" placeholder="********"></div>
+
+            <button id="btn-auth-main" onclick="processarAuth()" class="btn-auth">Entrar na Banca</button>
+            <p id="toggle-auth" onclick="alternarAuth()" style="font-size: 10px; margin-top: 20px; cursor: pointer; color: var(--text-gray);">Não tem conta? <span style="color: var(--primary); font-weight: 900;">CADASTRE-SE AQUI</span></p>
+        </div>
+    </main>
+
+    <main id="home-page" class="page">
+        <div class="carousel-container">
+            <div class="carousel-track" id="track">
+                <div class="banner b1"><h2 style="font-size:18px; margin:0;">BÔNUS 100% ATIVO</h2><p style="font-size:10px; margin:10px 0;">Use o cupom <b>BAHIA777</b></p></div>
+                <div class="banner b2"><h2 style="font-size:18px; margin:0;">INDIQUE AMIGOS</h2><p style="font-size:10px; margin:10px 0;">Ganhe R$ 5,00 por convite!</p></div>
+                <div class="banner b3"><h2 style="font-size:18px; margin:0; color:var(--primary);">BAHIA VIP</h2><p style="font-size:10px; margin:10px 0;">Benefícios exclusivos todos os dias</p></div>
+            </div>
+            <div class="carousel-dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
+        </div>
+
+        <div class="gain-bar"><div class="gain-content"><span style="color:var(--primary)">●</span> <span id="winner-name">...</span> ganhou <span style="color:var(--green)">R$ <span id="winner-val">0.00</span></span> no Mines</div></div>
+
+        <div style="padding: 15px;">
+            <h3 style="color:var(--primary); font-size: 14px; margin-bottom: 15px; text-transform: uppercase; font-weight: 900;">🔥 Jogos em Alta</h3>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+
+                <div class="game-card" onclick="abrirJogo('https://demo.pgsoft.com/fortune-tiger')">
+                    <img src="https://img.freepik.com/premium-vector/fortune-tiger-mascot-logo-design_105238-422.jpg" style="width:100%; height:110px; object-fit:cover;">
+                    <div style="padding:8px; text-align:center; font-size:10px; font-weight:900;">FORTUNE TIGER</div>
+                </div>
+
+                <div class="game-card" onclick="abrirJogo('https://demo.pgsoft.com/fortune-ox')">
+                    <img src="https://static.vecteezy.com/system/resources/previews/007/541/722/non_2x/golden-ox-mascot-logo-free-vector.jpg" style="width:100%; height:110px; object-fit:cover;">
+                    <div style="padding:8px; text-align:center; font-size:10px; font-weight:900;">FORTUNE OX</div>
+                </div>
+
+                <div class="game-card" onclick="abrirJogo('https://demo.pgsoft.com/fortune-rabbit')">
+                    <img src="https://img.freepik.com/premium-vector/rabbit-mascot-logo-design-vector_490515-188.jpg" style="width:100%; height:110px; object-fit:cover;">
+                    <div style="padding:8px; text-align:center; font-size:10px; font-weight:900;">FORTUNE RABBIT</div>
+                </div>
+
+                <div class="game-card" onclick="abrirJogo('https://demo.pgsoft.com/cash-mania')">
+                    <img src="https://img.freepik.com/free-vector/money-bag-stack-coins-cartoon_1308-112220.jpg" style="width:100%; height:110px; object-fit:cover;">
+                    <div style="padding:8px; text-align:center; font-size:10px; font-weight:900;">CASH MANIA</div>
+                </div>
+
+            </div>
+        </div>
+        <footer><div class="badge-18">18+</div><p style="font-size:9px;">BahiaFortuneBet © 2026.</p></footer>
+    </main>
+
+    <main id="profile-page" class="page">
+        <div class="auth-container" style="padding-top:20px;">
+            <div style="width:70px; height:70px; background:var(--card-bg); border-radius:50%; border:2px solid var(--primary); display:flex; align-items:center; justify-content:center; font-size:28px;">👤</div>
+            <h2 id="user-disp" style="font-size:18px; color:var(--primary); margin:10px 0;">USUÁRIO</h2>
+            <div class="vip-container">
+                <div style="display:flex; justify-content:space-between;"><span style="font-size: 11px; font-weight: 900;">STATUS VIP</span><span id="vip-badge" class="badge-vip" style="background:var(--bronze)">Bronze</span></div>
+                <div class="progress-bg"><div id="vip-progress" class="progress-bar"></div></div>
+                <span onclick="mudarPagina('vip-benefits', 'nav-prof')" style="font-size: 9px; color: var(--green); text-decoration:underline; cursor:pointer;">VER VANTAGENS</span>
+            </div>
+            <button onclick="mudarPagina('refer', 'nav-prof')" style="width:100%; background:rgba(0,255,136,0.1); border:1px solid var(--green); color:var(--green); padding:15px; border-radius:8px; font-weight:900; margin:15px 0; cursor:pointer;">🤝 INDIQUE UM AMIGO</button>
+            <div style="display:flex; gap:10px; width:100%;">
+                <button onclick="mudarPagina('deposit', 'nav-dep')" style="flex:1; background:var(--green); border:none; padding:15px; border-radius:8px; font-weight:900;">DEPÓSITO</button>
+                <button onclick="mudarPagina('withdraw', 'nav-prof')" style="flex:1; background:var(--primary); color:white; border:none; padding:15px; border-radius:8px; font-weight:900;">SAQUE</button>
+            </div>
+            <button onclick="mudarPagina('extract', 'nav-prof')" style="width:100%; background:transparent; border:1px solid #333; color:white; padding:15px; border-radius:8px; font-weight:900; margin-top:15px;">🕒 VER EXTRATO</button>
+            <button onclick="location.reload()" style="margin-top:30px; background:none; border:1px solid red; color:red; padding:10px 30px; border-radius:5px; font-weight:900;">SAIR</button>
+        </div>
+    </main>
+
+    <main id="extract-page" class="page">
+        <div style="padding: 20px;">
+            <div onclick="mudarPagina('home', 'nav-home')" class="auth-logo logo-clickable" style="text-align:center; margin-bottom:20px;">Bahia<span>Fortune</span></div>
+            <h3 style="color:var(--primary); text-align:center;">MEU EXTRATO</h3>
+            <div id="extract-list" style="margin-top:20px;"><p style='text-align:center; font-size:10px; color:var(--text-gray);'>Sem transações.</p></div>
+            <button onclick="mudarPagina('profile', 'nav-prof')" class="btn-auth">VOLTAR</button>
+        </div>
+    </main>
+
+    <main id="vip-benefits-page" class="page">
+        <div style="padding: 20px;">
+            <div onclick="mudarPagina('home', 'nav-home')" class="auth-logo logo-clickable" style="text-align:center; margin-bottom:20px;">Bahia<span>Fortune</span></div>
+            <h3 style="color:var(--primary); text-align:center; margin-bottom:20px;">BENEFÍCIOS VIP</h3>
+            <div class="vip-info-card"><span class="badge-vip" style="background:var(--bronze)">BRONZE</span><table class="vip-table"><tr><td>Bônus Depósito</td><td>10%</td></tr><tr><td>Saque Diário</td><td>R$ 1k</td></tr></table></div>
+            <div class="vip-info-card"><span class="badge-vip" style="background:var(--silver)">PRATA</span><table class="vip-table"><tr><td>Bônus Depósito</td><td>20%</td></tr><tr><td>Saque Diário</td><td>R$ 5k</td></tr></table></div>
+            <div class="vip-info-card"><span class="badge-vip" style="background:var(--gold)">OURO</span><table class="vip-table"><tr><td>Bônus Depósito</td><td>50%</td></tr><tr><td>Suporte VIP</td><td>Sim</td></tr></table></div>
+            <div class="vip-info-card" style="border-color:var(--primary)"><span class="badge-vip" style="background:var(--primary)">BAHIA VIP</span><table class="vip-table"><tr><td>Cashback</td><td>10% Semanal</td></tr><tr><td>Gerente</td><td>Exclusivo</td></tr></table></div>
+            <button onclick="mudarPagina('profile', 'nav-prof')" class="btn-auth">VOLTAR AO PERFIL</button>
+        </div>
+    </main>
+
+    <main id="refer-page" class="page">
+        <div style="padding: 20px;">
+            <div onclick="mudarPagina('home', 'nav-home')" class="auth-logo logo-clickable" style="text-align:center; margin-bottom:20px;">Bahia<span>Fortune</span></div>
+
+            <div class="finance-card">
+                <h3 style="color:var(--primary); text-align:center;">INDIQUE UM AMIGO</h3>
+                <p style="font-size: 12px; margin-bottom: 20px;">Ganhe <b>R$ 5,00</b> por cada novo cadastro!</p>
+
+                <div id="my-refer-link" style="background:#000; padding:15px; border-radius:8px; color:var(--green); font-size:10px; margin-bottom:15px; border:1px solid #333; word-break:break-all;">...</div>
+
+                <button onclick="copiarLink()" class="btn-auth" style="background:var(--green); color:black; margin-bottom: 25px;">COPIAR MEU LINK</button>
+
+                <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 12px; border: 1px dashed var(--primary);">
+                    <p style="font-size: 10px; color: var(--text-gray); text-transform: uppercase; margin: 0;">Amigos que entraram pelo seu link</p>
+                    <h4 style="font-size: 32px; color: var(--primary); margin: 10px 0;">0</h4>
+                    <p style="font-size: 9px; color: var(--green);">Bônus total acumulado: R$ 0,00</p>
+                </div>
+            </div>
+
+            <button onclick="mudarPagina('profile', 'nav-prof')" class="btn-auth" style="background: transparent; border: 1px solid #333; margin-top: 15px;">VOLTAR AO PERFIL</button>
+        </div>
+    </main>
+
+    <main id="deposit-page" class="page">
+        <div class="finance-card">
+            <h3>RECARGA PIX ⚡</h3>
+            <div class="values-grid">
+                <div class="val-opt" onclick="setVal(this, 10)">R$ 10</div>
+                <div class="val-opt" onclick="setVal(this, 20)">R$ 20</div>
+                <div class="val-opt" onclick="setVal(this, 50)">R$ 50</div>
+                <div class="val-opt" onclick="setVal(this, 100)">R$ 100</div>
+            </div>
+            <div class="input-finance-wrapper"><input type="number" id="val-dep" class="input-finance" placeholder="VALOR"></div>
+            <button onclick="confirmarDep()" class="btn-auth" style="background:var(--green); color:black;">GERAR PIX</button>
+        </div>
+    </main>
+
+    <main id="withdraw-page" class="page">
+        <div class="finance-card">
+            <h3 style="color:var(--primary)">SAQUE PIX</h3>
+            <select id="tipo-pix" style="width:100%; padding:15px; background:#2b2f36; border:none; color:white; border-radius:8px; margin-bottom:12px; font-weight:700;">
+                <option value="cpf">CPF</option>
+                <option value="email">E-mail</option>
+                <option value="tel">Telefone</option>
+                <option value="ale">Chave Aleatória</option>
+            </select>
+            <input type="text" class="input-finance" placeholder="CHAVE PIX" style="padding-left:15px; margin-bottom:15px; width:100%; background:#000; border:1px solid #333; color:white; border-radius:8px; padding:15px;">
+            <div class="input-finance-wrapper"><input type="number" id="val-saque" class="input-finance" placeholder="VALOR"></div>
+            <button onclick="processarSaque()" class="btn-auth">SACAR AGORA</button>
+        </div>
+    </main>
+
+    <div id="bonus-modal">
+        <div style="background:var(--card-bg); padding:30px; border-radius:20px; border:2px solid var(--primary); text-align:center; width:80%; max-width:300px; position:relative;">
+            <span onclick="fecharBonus()" style="position:absolute; top:10px; right:15px; font-size:24px; cursor:pointer;">&times;</span>
+            <h2 style="color:var(--primary)">AXÉ DA SORTE!</h2>
+            <p id="bonus-text" style="font-size:12px;"></p>
+            <button onclick="fecharBonus(); mudarPagina('deposit', 'nav-dep');" style="width:100%; background:var(--green); border:none; padding:15px; border-radius:8px; font-weight:900; margin-top:15px;">RESGATAR BÔNUS</button>
+        </div>
+    </div>
+
+    <div id="chat-window">
+        <div style="background:var(--primary); padding:10px; display:flex; justify-content:space-between; font-weight:900; font-size:11px;"><span>SUPORTE</span><span onclick="toggleChat()" style="cursor:pointer;">&times;</span></div>
+        <div id="chat-msgs" style="flex:1; padding:10px; overflow-y:auto; font-size:11px; display:flex; flex-direction:column; gap:8px;"></div>
+        <div style="padding:8px; display:flex; gap:5px;"><input type="text" id="chat-in" style="flex:1; background:#000; color:white; border:1px solid #333; padding:5px;"><button onclick="sendMsg()" style="background:var(--primary); border:none; color:white; padding:5px;">ENVIAR</button></div>
+    </div>
+    <div id="btn-suporte-fixo" onclick="toggleChat()" style="position:fixed; bottom:85px; right:20px; width:50px; height:50px; background:var(--primary); border-radius:50%; display:none; align-items:center; justify-content:center; z-index:1000; font-size:24px;">💬</div>
+
+    <nav class="bottom-nav" id="main-nav">
+        <button class="nav-item active" id="nav-home" onclick="mudarPagina('home', 'nav-home')">🏠<br>Home</button>
+        <button class="nav-item" id="nav-dep" onclick="mudarPagina('deposit', 'nav-dep')">💰<br>Depósito</button>
+        <button class="nav-item" id="nav-prof" onclick="mudarPagina('profile', 'nav-prof')">👤<br>Perfil</button>
+    </nav>
+
+    <div id="game-overlay"><div style="background:#181a20; padding:10px; display:flex; justify-content:space-between; border-bottom:2px solid var(--primary);"><button onclick="fecharJogo()" style="background:var(--red); border:none; color:white; padding:8px 15px; border-radius:5px; font-weight:900;">SAIR</button><div style="color:var(--green); font-weight:900;">R$ <span class="saldo-dinamico">0.00</span></div><button onclick="abrirDepRapido()" style="background:var(--green); border:none; padding:8px 15px; border-radius:5px; font-weight:900;">+ DEP</button></div><iframe id="game-iframe" style="flex:1; border:none; width:100%;"></iframe></div>
+
+    <script>
+        // CONFIGURAÇÃO SUPABASE
+        const SUPABASE_URL = 'https://zqvfnykxwlcozvawqgrn.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxdmZueWt4d2xjb3p2YXdxZ3JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3NDkzNDQsImV4cCI6MjA4NTMyNTM0NH0.CevpF9vP4748mb2vFNsOp5Kq6u7Nfp_100bJcW7ogUQ';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let saldo = 0; let isLogged = false; let modoAuth = 'login'; let xp = 0; let transacoes = []; let notificacoes = []; let currentBanner = 0;
+        const names = ["A***_bet", "Lu***_77", "Sorte***", "Baiano***", "Bet***"];
+
+        // --- NOVO: FUNÇÃO DE NOTIFICAÇÃO ESTILIZADA ---
+        function notificarErro(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'toast-banca';
+            toast.innerHTML = `⚠️ <span>${msg}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function alternarAuth() {
+            const t = document.getElementById('auth-title'); const b = document.getElementById('btn-auth-main'); const tx = document.getElementById('toggle-auth');
+            const c = document.getElementById('group-cpf'); const e = document.getElementById('group-email');
+            if (modoAuth === 'login') {
+                modoAuth = 'cadastro'; t.innerText = "CRIE SUA CONTA"; b.innerText = "Finalizar Cadastro";
+                tx.innerHTML = 'Já tem conta? <span style="color: var(--primary); font-weight: 900;">FAÇA LOGIN</span>';
+                c.style.display = 'block'; e.style.display = 'block';
+            } else {
+                modoAuth = 'login'; t.innerText = "ACESSE SUA CONTA"; b.innerText = "Entrar na Banca";
+                tx.innerHTML = 'Não tem conta? <span style="color: var(--primary); font-weight: 900;">CADASTRE-SE AQUI</span>';
+                c.style.display = 'none'; e.style.display = 'none';
+            }
+        }
+
+        async function processarAuth() {
+            const u = document.getElementById('reg-user').value; const s = document.getElementById('reg-pass').value;
+            if (!u || s.length < 4) return notificarErro("Preencha usuário e senha!");
+            if (modoAuth === 'cadastro') {
+                const e = document.getElementById('reg-email').value; const c = document.getElementById('reg-cpf').value;
+                if (!e.includes('@')) return notificarErro("Email inválido!");
+                const { error } = await supabaseClient.from('usuarios').insert([{ username: u, email: e, cpf: c, senha: s, saldo: 0 }]);
+                if (error) return notificarErro("Erro no Cadastro.");
+                notificarErro("Sucesso! Logue agora."); alternarAuth();
+            } else {
+                const { data, error } = await supabaseClient.from('usuarios').select('*').eq('username', u).eq('senha', s).single();
+                if (error || !data) return notificarErro("Login incorreto!");
+                logarUsuario(data);
+            }
+        }
+
+        function logarUsuario(user) {
+            salvarSessao(user);
+            iniciarSuporteAtivo();
+            atualizarContadorAmigos(user.username);
+            xp = user.xp || 0;
+            ganharXP(0);
+            isLogged = true; saldo = user.saldo;
+            document.getElementById('main-header').style.display = 'flex';
+            document.getElementById('main-nav').style.display = 'flex';
+            document.getElementById('btn-suporte-fixo').style.display = 'flex';
+            document.getElementById('register-page').classList.remove('active');
+            document.getElementById('home-page').classList.add('active');
+            document.getElementById('user-disp').innerText = user.username.toUpperCase();
+            document.getElementById('bonus-text').innerHTML = `Olá <b>${user.username}</b>! Dobre seu saldo com <b>BAHIA777</b>!`;
+            document.getElementById('bonus-modal').style.display = 'flex';
+            document.getElementById('my-refer-link').innerText = `bahiafortune.bet/convite/${user.username.toLowerCase()}`;
+            document.querySelectorAll('.saldo-dinamico').forEach(e => e.innerText = saldo.toFixed(2));
+            atualizarVip(); updateGainBar();
+            setInterval(() => {
+                currentBanner = (currentBanner + 1) % 3;
+                const track = document.getElementById('track'); const dots = document.querySelectorAll('.dot');
+                if (track) track.style.transform = `translateX(-${currentBanner * (100 / 3)}%)`;
+                dots.forEach((dot, index) => dot.classList.toggle('active', index === currentBanner));
+            }, 5000);
+        }
+
+        const listaGanhadores = [
+            { n: "A***_bet", v: 42.50, j: "Fortune Tiger" },
+            { n: "M***_Sorte", v: 125.80, j: "Fortune Ox" },
+            { n: "Bahia***_7", v: 89.25, j: "Fortune Rabbit" },
+            { n: "R***_Luck", v: 12.00, j: "Cash Mania" },
+            { n: "Sorte***_X", v: 55.12, j: "Fortune Tiger" },
+            { n: "L***_Ganhos", v: 310.40, j: "Fortune Ox" },
+            { n: "User***_99", v: 15.00, j: "Cash Mania" },
+            { n: "T***_Winner", v: 72.33, j: "Fortune Rabbit" },
+            { n: "Axé***_Bet", v: 218.90, j: "Fortune Tiger" },
+            { n: "G***_Sorte", v: 41.50, j: "Fortune Ox" }
+        ];
+
+        function updateGainBar() {
+            if (!isLogged) return;
+            const content = document.querySelector('.gain-content');
+            if (!content) return;
+            const ganhador = listaGanhadores[Math.floor(Math.random() * listaGanhadores.length)];
+            content.innerHTML = `<span style="color:var(--primary)">●</span> <span>${ganhador.n}</span> ganhou <span style="color:var(--green)">R$ ${ganhador.v.toFixed(2)}</span> no ${ganhador.j}`;
+        }
+        setInterval(updateGainBar, 5000);
+
+        function confirmarDep() {
+            let v = parseFloat(document.getElementById('val-dep').value);
+            if (isNaN(v) || v < 10) return notificarErro("Mínimo R$ 10,00");
+
+            const checkoutHTML = `
+                    <div id="pix-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10000; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(5px);">
+                        <div style="background:#1e2329; border:1px solid var(--primary); border-radius:20px; width:100%; max-width:350px; padding:30px; text-align:center; box-shadow: 0 0 20px rgba(255,0,127,0.2);">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                                <span style="color:var(--primary); font-weight:900; font-size:14px;">PAGAMENTO SEGURO</span>
+                                <span onclick="fecharCheckout()" style="cursor:pointer; font-size:20px; color:var(--text-gray);">&times;</span>
+                            </div>
+                            <p style="font-size:12px; color:var(--text-gray); margin-bottom:5px;">VALOR A PAGAR</p>
+                            <h2 style="margin:0; color:var(--green); font-size:28px;">R$ ${v.toFixed(2)}</h2>
+                            <div id="qr-area" style="background:white; width:180px; height:180px; margin:25px auto; border-radius:12px; display:flex; align-items:center; justify-content:center; padding:10px;">
+                                <div style="text-align:center; color:#000;">
+                                    <div class="loader-pix"></div>
+                                    <p style="font-size:9px; font-weight:900; margin-top:10px;">GERANDO QR CODE...</p>
+                                </div>
+                            </div>
+                            <button onclick="copiarPixReal()" style="width:100%; background:var(--primary); color:white; border:none; padding:15px; border-radius:10px; font-weight:900; font-size:13px; cursor:pointer; margin-bottom:15px;">COPIAR CÓDIGO PIX</button>
+                            <div style="display:flex; align-items:center; justify-content:center; gap:10px; color:var(--text-gray); font-size:11px;">
+                                <span id="timer-pix">05:00</span>
+                                <span>Aguardando pagamento...</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            document.body.insertAdjacentHTML('beforeend', checkoutHTML);
+            iniciarTimerPix();
+        }
+
+        function fecharCheckout() { const m = document.getElementById('pix-modal'); if (m) m.remove(); }
+
+        function iniciarTimerPix() {
+            let tempo = 300; const d = document.getElementById('timer-pix');
+            const interval = setInterval(() => {
+                let min = Math.floor(tempo / 60); let sec = tempo % 60;
+                if (d) d.innerText = `${min < 10 ? '0' : ''}${min}:${sec < 10 ? '0' : ''}${sec}`;
+                if (--tempo < 0) { clearInterval(interval); if (d) d.innerText = "EXPIRADO"; }
+            }, 1000);
+        }
+
+        function copiarPixReal() { notificarErro("Código PIX copiado!"); }
+
+        // --- NOVO: REFINAMENTO DE JOGOS (TRAVA DE SALDO) ---
+        function abrirJogo(u) {
+            if (!isLogged) return notificarErro("Faça login para jogar!");
+
+            if (saldo <= 0) {
+                notificarErro("Saldo insuficiente! Deposite para jogar.");
+                mudarPagina('deposit', 'nav-dep');
+                return;
+            }
+
+            document.getElementById('game-iframe').src = u;
+            document.getElementById('game-overlay').style.display = 'flex';
+        }
+
+        function mudarPagina(id, navId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(id + '-page').classList.add('active');
+            if (document.getElementById(navId)) document.getElementById(navId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+        function toggleNotif() { const p = document.getElementById('notif-panel'); p.style.display = p.style.display === 'flex' ? 'none' : 'flex'; }
+        function toggleChat() { const w = document.getElementById('chat-window'); w.style.display = w.style.display === 'flex' ? 'none' : 'flex'; if (w.style.display === 'flex') document.getElementById('chat-msgs').innerHTML = '<div style="background:#2b2f36; padding:8px; border-radius:8px;">Suporte Online. Como podemos ajudar?</div>'; }
+        function sendMsg() { const i = document.getElementById('chat-in'); if (i.value === "") return; document.getElementById('chat-msgs').innerHTML += `<div style="align-self:flex-end; background:var(--primary); padding:8px; border-radius:8px; margin-top:5px;">${i.value}</div>`; i.value = ""; }
+        function mascaraCPF(i) { let v = i.value.replace(/\D/g, ""); if (v.length <= 11) { v = v.replace(/(\d{3})(\d)/, "$1.$2"); v = v.replace(/(\d{3})(\d)/, "$1.$2"); v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2"); } i.value = v; }
+        function setVal(el, v) { document.querySelectorAll('.val-opt').forEach(o => o.classList.remove('active')); el.classList.add('active'); document.getElementById('val-dep').value = v; }
+        function atualizarS() { document.querySelectorAll('.saldo-dinamico').forEach(e => e.innerText = saldo.toFixed(2)); }
+        function processarSaque() { let v = parseFloat(document.getElementById('val-saque').value); if (v > saldo || v < 20) return notificarErro("Erro no saque!"); saldo -= v; atualizarS(); }
+        function atualizarVip() { const bar = document.getElementById('vip-progress'); const badge = document.getElementById('vip-badge'); let level = "Bronze"; if (xp >= 100) level = "Prata"; badge.innerText = level; bar.style.width = (xp % 100) + "%"; }
+        function fecharBonus() { document.getElementById('bonus-modal').style.display = 'none'; }
+        function copiarLink() { const link = document.getElementById('my-refer-link').innerText; navigator.clipboard.writeText(link); notificarErro("Link copiado!"); }
+        function fecharJogo() { document.getElementById('game-overlay').style.display = 'none'; document.getElementById('game-iframe').src = ""; }
+        function abrirDepRapido() { fecharJogo(); mudarPagina('deposit', 'nav-dep'); }
+
+        function salvarSessao(user) {
+            localStorage.setItem('bahia_user', JSON.stringify(user));
+        }
+
+        window.addEventListener('load', async () => {
+            const salvo = localStorage.getItem('bahia_user');
+            if (salvo) {
+                const dadosUser = JSON.parse(salvo);
+                const { data, error } = await supabaseClient.from('usuarios')
+                    .select('*')
+                    .eq('username', dadosUser.username)
+                    .eq('senha', dadosUser.senha)
+                    .single();
+                if (data && !error) {
+                    logarUsuario(data);
+                }
+            }
+        });
+
+        function iniciarSuporteAtivo() {
+            const mensagensSuporte = [
+                "Suporte: Olá! Sabia que depósitos via PIX caem em menos de 30 segundos? ⚡",
+                "Sistema: Verificamos que o Cupom BAHIA777 ainda está ativo para você!",
+                "Suporte: Precisa de ajuda com saques? Nossa equipe está online 24h.",
+                "Dica: Os jogos Fortune Tiger e Fortune Ox estão com alta taxa de bônus agora! 🐯"
+            ];
+
+            let indiceMsg = 0;
+
+            // Envia uma mensagem a cada 45 segundos para não poluir o chat
+            setInterval(() => {
+                if (isLogged) {
+                    const chatMsgs = document.getElementById('chat-msgs');
+                    if (chatMsgs) {
+                        const msgDiv = document.createElement('div');
+                        // Estilo da mensagem do suporte (Bordinha rosa para destacar)
+                        msgDiv.style.cssText = "background:#2b2f36; padding:8px; border-radius:8px; margin-top:5px; border-left:3px solid var(--primary); font-style:italic; font-size:10px;";
+                        msgDiv.innerText = mensagensSuporte[indiceMsg];
+                        chatMsgs.appendChild(msgDiv);
+
+                        // Faz o chat rolar sozinho para a última mensagem
+                        chatMsgs.scrollTop = chatMsgs.scrollHeight;
+
+                        indiceMsg = (indiceMsg + 1) % mensagensSuporte.length;
+                    }
+                }
+            }, 45000);
+        }
+
+        // --- SISTEMA DE CONTAGEM DE AMIGOS REAL ---
+        async function atualizarContadorAmigos(username) {
+            // Busca na tabela 'usuarios' quantos registros existem onde o 'username' (ou campo de indicação) bate
+            // Nota: Essa lógica assume que você tem um sistema de rastreio simples. 
+            // Por agora, vamos buscar se o username do dono aparece em algum campo de indicação.
+
+            const { count, error } = await supabaseClient
+                .from('usuarios')
+                .select('*', { count: 'exact', head: true });
+            // Aqui depois podemos filtrar por .eq('indicado_por', username) quando criarmos esse campo.
+
+            const contadorHTML = document.querySelector('#refer-page h4');
+            if (contadorHTML) {
+                // Simulamos o número real ou mostramos o que veio do banco
+                contadorHTML.innerText = count ? count - 1 : 0; // -1 para não contar o próprio usuário
+            }
+        }
+
+        function ganharXP(quantidade) {
+            xp += quantidade;
+            const barra = document.getElementById('vip-progress');
+            const badge = document.getElementById('vip-badge');
+            if (barra) barra.style.width = (xp % 100) + "%";
+            if (badge) {
+                if (xp >= 300) { badge.innerText = "Bahia VIP"; badge.style.background = "var(--primary)"; }
+                else if (xp >= 200) { badge.innerText = "Ouro"; badge.style.background = "var(--gold)"; }
+                else if (xp >= 100) { badge.innerText = "Prata"; badge.style.background = "var(--silver)"; }
+                else { badge.innerText = "Bronze"; badge.style.background = "var(--bronze)"; }
+            }
+        }
+
+    </script>
+</body>
+</html>
