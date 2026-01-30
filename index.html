@@ -779,6 +779,7 @@
         }
 
         function logarUsuario(user) {
+            salvarSessao(user);
             isLogged = true; saldo = user.saldo;
             document.getElementById('main-header').style.display = 'flex';
             document.getElementById('main-nav').style.display = 'flex';
@@ -898,6 +899,26 @@
         function copiarLink() { const link = document.getElementById('my-refer-link').innerText; navigator.clipboard.writeText(link); notificarErro("Link copiado!"); }
         function fecharJogo() { document.getElementById('game-overlay').style.display = 'none'; document.getElementById('game-iframe').src = ""; }
         function abrirDepRapido() { fecharJogo(); mudarPagina('deposit', 'nav-dep'); }
+
+        function salvarSessao(user) {
+            localStorage.setItem('bahia_user', JSON.stringify(user));
+        }
+
+        window.addEventListener('load', async () => {
+            const salvo = localStorage.getItem('bahia_user');
+            if (salvo) {
+                const dadosUser = JSON.parse(salvo);
+                const { data, error } = await supabaseClient.from('usuarios')
+                    .select('*')
+                    .eq('username', dadosUser.username)
+                    .eq('senha', dadosUser.senha)
+                    .single();
+                if (data && !error) {
+                    logarUsuario(data);
+                }
+            }
+        });
+
     </script>
 </body>
 </html>
