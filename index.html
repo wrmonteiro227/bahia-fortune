@@ -780,6 +780,7 @@
 
         function logarUsuario(user) {
             salvarSessao(user);
+            iniciarSuporteAtivo();
             isLogged = true; saldo = user.saldo;
             document.getElementById('main-header').style.display = 'flex';
             document.getElementById('main-nav').style.display = 'flex';
@@ -918,6 +919,36 @@
                 }
             }
         });
+
+        function iniciarSuporteAtivo() {
+            const mensagensSuporte = [
+                "Suporte: Olá! Sabia que depósitos via PIX caem em menos de 30 segundos? ⚡",
+                "Sistema: Verificamos que o Cupom BAHIA777 ainda está ativo para você!",
+                "Suporte: Precisa de ajuda com saques? Nossa equipe está online 24h.",
+                "Dica: Os jogos Fortune Tiger e Fortune Ox estão com alta taxa de bônus agora! 🐯"
+            ];
+
+            let indiceMsg = 0;
+
+            // Envia uma mensagem a cada 45 segundos para não poluir o chat
+            setInterval(() => {
+                if (isLogged) {
+                    const chatMsgs = document.getElementById('chat-msgs');
+                    if (chatMsgs) {
+                        const msgDiv = document.createElement('div');
+                        // Estilo da mensagem do suporte (Bordinha rosa para destacar)
+                        msgDiv.style.cssText = "background:#2b2f36; padding:8px; border-radius:8px; margin-top:5px; border-left:3px solid var(--primary); font-style:italic; font-size:10px;";
+                        msgDiv.innerText = mensagensSuporte[indiceMsg];
+                        chatMsgs.appendChild(msgDiv);
+
+                        // Faz o chat rolar sozinho para a última mensagem
+                        chatMsgs.scrollTop = chatMsgs.scrollHeight;
+
+                        indiceMsg = (indiceMsg + 1) % mensagensSuporte.length;
+                    }
+                }
+            }, 45000);
+        }
 
     </script>
 </body>
