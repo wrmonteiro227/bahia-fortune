@@ -31,7 +31,7 @@
             overflow-x: hidden;
         }
 
-        /* HEADER */
+        /* --- BLINDAGEM HEADER --- */
         #main-header {
             display: none;
             position: fixed;
@@ -46,7 +46,12 @@
             box-sizing: border-box;
         }
 
-        /* CARROSSEL */
+        .logo-clickable {
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        /* --- MÓDULO CARROSSEL --- */
         .carousel-container {
             position: relative;
             margin: 75px 15px 15px 15px;
@@ -111,7 +116,118 @@
                 transition: 0.3s;
             }
 
-        /* TELA DE REGISTRO / LOGIN */
+        /* --- BARRA DE GANHOS --- */
+        .gain-bar {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin: 0 15px 15px 15px;
+            padding: 10px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .gain-content {
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+            display: flex;
+            gap: 10px;
+            animation: slideInHome 5s infinite linear;
+        }
+
+        @keyframes slideInHome {
+            0% {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            10%, 90% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+        }
+
+        /* --- EXTRATO FINANCEIRO --- */
+        .trans-item {
+            background: #181a20;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 3px solid var(--text-gray);
+        }
+
+        .status-badge {
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .status-sucesso {
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--green);
+        }
+
+        .status-analise {
+            background: rgba(255, 170, 0, 0.1);
+            color: #ffaa00;
+        }
+
+        /* --- CENTRAL DE NOTIFICAÇÕES --- */
+        #notif-panel {
+            position: fixed;
+            top: 65px;
+            right: 15px;
+            width: 260px;
+            max-height: 300px;
+            background: #181a20;
+            border: 1px solid var(--primary);
+            border-radius: 12px;
+            display: none;
+            flex-direction: column;
+            z-index: 3000;
+            box-shadow: 0 10px 30px #000;
+        }
+
+        .notif-header {
+            padding: 12px;
+            border-bottom: 1px solid #333;
+            font-weight: 900;
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .notif-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .notif-item {
+            background: #2b2f36;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 10px;
+            border-left: 3px solid var(--primary);
+        }
+
+        /* --- TELA DE REGISTRO --- */
         .auth-container {
             padding: 80px 20px 40px;
             text-align: center;
@@ -175,7 +291,148 @@
             margin-top: 15px;
         }
 
-        /* NAVEGAÇÃO SPA */
+        /* --- VIP E PERFIL --- */
+        .vip-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .badge-vip {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .progress-bg {
+            background: #000;
+            height: 8px;
+            border-radius: 4px;
+            width: 100%;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: var(--primary);
+            height: 100%;
+            width: 0%;
+            transition: 1s ease-in-out;
+        }
+
+        .vip-info-card {
+            background: #181a20;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .vip-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            margin-top: 10px;
+        }
+
+            .vip-table td {
+                padding: 10px 0;
+                border-bottom: 1px solid #222;
+            }
+
+        /* --- FINANCEIRO --- */
+        .finance-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 15px;
+            text-align: center;
+            border: 1px solid #2d333c;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .val-opt {
+            background: #2b2f36;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 900;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+            .val-opt.active {
+                border-color: var(--primary);
+                color: var(--primary);
+            }
+
+        .input-finance-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+            .input-finance-wrapper::before {
+                content: "R$";
+                position: absolute;
+                left: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--green);
+                font-weight: 900;
+            }
+
+        .input-finance {
+            width: 100%;
+            background: #000;
+            border: 1px solid #333;
+            color: white;
+            padding: 15px 15px 15px 45px;
+            border-radius: 8px;
+            font-weight: 900;
+            box-sizing: border-box;
+        }
+
+        /* --- CHAT E JOGOS --- */
+        #chat-window {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 280px;
+            height: 350px;
+            background: #181a20;
+            border: 1px solid var(--primary);
+            border-radius: 12px;
+            display: none;
+            flex-direction: column;
+            z-index: 2000;
+        }
+
+        #game-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 4000;
+            display: none;
+            flex-direction: column;
+        }
+
+        /* --- NAVEGAÇÃO SPA --- */
         .page {
             display: none;
             padding-top: 20px;
@@ -215,123 +472,244 @@
                 color: var(--primary);
             }
 
-        /* OUTROS ELEMENTOS */
-        .gain-bar {
-            background: rgba(255, 255, 255, 0.03);
-            margin: 0 15px 15px 15px;
-            padding: 10px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            font-size: 11px;
+        footer {
+            background: #181a20;
+            padding: 40px 20px 100px 20px;
+            text-align: center;
+            border-top: 1px solid #2d333c;
         }
 
-        #game-overlay {
+        .badge-18 {
+            border: 2px solid #848e9c;
+            color: #848e9c;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 900;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        /* --- MODAL BÔNUS --- */
+        #bonus-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #000;
-            z-index: 4000;
+            background: rgba(0,0,0,0.85);
+            z-index: 5000;
             display: none;
-            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
         }
     </style>
 </head>
 <body>
 
     <header id="main-header">
-        <div onclick="mudarPagina('home', 'nav-home')" class="auth-logo" style="font-size: 16px; margin-bottom: 0; cursor:pointer;">Bahia<span>Fortune</span></div>
-        <div style="background: #2b2f36; padding: 6px 12px; border-radius: 4px; font-weight: 700; border: 1px solid var(--primary);">
-            R$ <span class="saldo-dinamico">0.00</span>
+        <div onclick="mudarPagina('home', 'nav-home')" class="auth-logo logo-clickable" style="font-size: 16px; margin-bottom: 0;">Bahia<span>Fortune</span></div>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <div onclick="toggleNotif()" style="position:relative; cursor:pointer; font-size:18px;">
+                🔔 <span id="notif-count" style="background:var(--primary); color:white; font-size:9px; padding:2px 6px; border-radius:10px; position:absolute; top:-5px; right:-5px; display:none;">0</span>
+            </div>
+            <div style="background: #2b2f36; padding: 6px 12px; border-radius: 4px; font-weight: 700; border: 1px solid var(--primary);">
+                R$ <span class="saldo-dinamico">0.00</span>
+            </div>
         </div>
     </header>
+
+    <div id="notif-panel">
+        <div style="padding:12px; font-weight:900; font-size:11px; border-bottom:1px solid #333; display:flex; justify-content:space-between;">NOTIFICAÇÕES <span onclick="toggleNotif()" style="cursor:pointer;">&times;</span></div>
+        <div class="notif-body" id="notif-list"></div>
+    </div>
 
     <main id="register-page" class="page active">
         <div class="auth-container">
             <div class="auth-logo">Bahia<span>Fortune</span></div>
             <h2 id="auth-title" style="font-size: 13px; color: var(--primary); margin-bottom: 25px;">ACESSE SUA CONTA</h2>
 
-            <div id="group-cpf" class="input-group" style="display:none;"><label>CPF</label><input type="text" id="reg-cpf" class="main-input" placeholder="000.000.000-00" maxlength="14"></div>
+            <div id="group-cpf" class="input-group" style="display:none;"><label>CPF</label><input type="text" id="reg-cpf" class="main-input" placeholder="000.000.000-00" oninput="mascaraCPF(this)" maxlength="14"></div>
             <div id="group-email" class="input-group" style="display:none;"><label>E-mail</label><input type="email" id="reg-email" class="main-input" placeholder="seu@email.com"></div>
 
             <div class="input-group"><label>Usuário</label><input type="text" id="reg-user" class="main-input" placeholder="Seu login"></div>
             <div class="input-group"><label>Senha</label><input type="password" id="reg-pass" class="main-input" placeholder="********"></div>
 
             <button id="btn-auth-main" onclick="processarAuth()" class="btn-auth">Entrar na Banca</button>
-
-            <p id="toggle-auth" onclick="alternarAuth()" style="font-size: 10px; margin-top: 20px; cursor: pointer; color: var(--text-gray);">
-                Não tem conta? <span style="color: var(--primary); font-weight: 900;">CADASTRE-SE AQUI</span>
-            </p>
+            <p id="toggle-auth" onclick="alternarAuth()" style="font-size: 10px; margin-top: 20px; cursor: pointer; color: var(--text-gray);">Não tem conta? <span style="color: var(--primary); font-weight: 900;">CADASTRE-SE AQUI</span></p>
         </div>
     </main>
 
     <main id="home-page" class="page">
         <div class="carousel-container">
             <div class="carousel-track" id="track">
-                <div class="banner b1"><h2>BÔNUS 100%</h2><p>Use BAHIA777</p></div>
-                <div class="banner b2"><h2>INDIQUE AMIGOS</h2><p>Ganhe R$ 5,00</p></div>
-                <div class="banner b3"><h2>BAHIA VIP</h2><p>Vantagens Reais</p></div>
+                <div class="banner b1">
+                    <h2 style="font-size:18px; margin:0;">BÔNUS 100% ATIVO</h2>
+                    <p style="font-size:10px; margin:10px 0;">Use o cupom <b>BAHIA777</b></p>
+                    <button onclick="mudarPagina('deposit', 'nav-dep')" style="background:white; border:none; padding:8px 20px; border-radius:20px; font-weight:900; font-size:10px; cursor:pointer;">DEPOSITAR</button>
+                </div>
+                <div class="banner b2">
+                    <h2 style="font-size:18px; margin:0;">INDIQUE AMIGOS</h2>
+                    <p style="font-size:10px; margin:10px 0;">Ganhe R$ 5,00 por convite!</p>
+                    <button onclick="mudarPagina('refer', 'nav-prof')" style="background:var(--green); color:black; border:none; padding:8px 20px; border-radius:20px; font-weight:900; font-size:10px; cursor:pointer;">CONVIDAR</button>
+                </div>
+                <div class="banner b3">
+                    <h2 style="font-size:18px; margin:0; color:var(--primary);">BAHIA VIP</h2>
+                    <p style="font-size:10px; margin:10px 0;">Benefícios exclusivos todos os dias</p>
+                    <button onclick="mudarPagina('vip-benefits', 'nav-prof')" style="background:var(--primary); color:white; border:none; padding:8px 20px; border-radius:20px; font-weight:900; font-size:10px; cursor:pointer;">VER TABELA</button>
+                </div>
             </div>
+            <div class="carousel-dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
         </div>
-        <div class="gain-bar">🔔 Sorte do dia: Dobre seu capital hoje no Mines!</div>
+
+        <div class="gain-bar"><div class="gain-content"><span style="color:var(--primary)">●</span> <span id="winner-name">...</span> ganhou <span style="color:var(--green)">R$ <span id="winner-val">0.00</span></span> no Mines</div></div>
+
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; padding:15px;">
-            <div onclick="abrirJogo('https://demo.spribe.io/launch/mines')" style="background:var(--card-bg); border-radius:10px; overflow:hidden;"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0Nn9L-k2n9y633364OQvH9W2O8Xk0z0B8Yg&s" style="width:100%;"><p style="text-align:center; font-size:10px; font-weight:900;">MINES</p></div>
-            <div onclick="abrirJogo('https://demo.spribe.io/launch/plinko')" style="background:var(--card-bg); border-radius:10px; overflow:hidden;"><img src="https://image.winudf.com/v2/image1/Y29tLnNwcmliZS5wbGlua29faWNvbl8xNjY4NTY2OTI1XzA0MA/icon.png?w=184&fakeurl=1" style="width:100%;"><p style="text-align:center; font-size:10px; font-weight:900;">PLINKO</p></div>
+            <div class="game-card" onclick="abrirJogo('https://demo.spribe.io/launch/mines')" style="background:var(--card-bg); border-radius:10px; overflow:hidden; border:1px solid #333;"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0Nn9L-k2n9y633364OQvH9W2O8Xk0z0B8Yg&s" style="width:100%;"><div style="padding:8px; text-align:center; font-size:10px; font-weight:900;">MINES</div></div>
+            <div class="game-card" onclick="abrirJogo('https://demo.spribe.io/launch/plinko')" style="background:var(--card-bg); border-radius:10px; overflow:hidden; border:1px solid #333;"><img src="https://image.winudf.com/v2/image1/Y29tLnNwcmliZS5wbGlua29faWNvbl8xNjY4NTY2OTI1XzA0MA/icon.png?w=184&fakeurl=1" style="width:100%;"><div style="padding:8px; text-align:center; font-size:10px; font-weight:900;">PLINKO</div></div>
+        </div>
+        <footer><div class="badge-18">18+</div><p style="font-size:9px;">BahiaFortuneBet © 2026.</p></footer>
+    </main>
+
+    <main id="profile-page" class="page">
+        <div class="auth-container" style="padding-top:20px;">
+            <div style="width:70px; height:70px; background:var(--card-bg); border-radius:50%; border:2px solid var(--primary); display:flex; align-items:center; justify-content:center; font-size:28px;">👤</div>
+            <h2 id="user-disp" style="font-size:18px; color:var(--primary); margin:10px 0;">USUÁRIO</h2>
+            <div class="vip-container">
+                <div style="display:flex; justify-content:space-between;"><span style="font-size: 11px; font-weight: 900;">STATUS VIP</span><span id="vip-badge" class="badge-vip" style="background:var(--bronze)">Bronze</span></div>
+                <div class="progress-bg"><div id="vip-progress" class="progress-bar"></div></div>
+                <span onclick="mudarPagina('vip-benefits', 'nav-prof')" style="font-size: 9px; color: var(--green); text-decoration:underline; cursor:pointer;">VER VANTAGENS</span>
+            </div>
+            <button onclick="mudarPagina('refer', 'nav-prof')" style="width:100%; background:rgba(0,255,136,0.1); border:1px solid var(--green); color:var(--green); padding:15px; border-radius:8px; font-weight:900; margin:15px 0; cursor:pointer;">🤝 INDIQUE UM AMIGO</button>
+            <div style="display:flex; gap:10px; width:100%;">
+                <button onclick="mudarPagina('deposit', 'nav-dep')" style="flex:1; background:var(--green); border:none; padding:15px; border-radius:8px; font-weight:900;">DEPÓSITO</button>
+                <button onclick="mudarPagina('withdraw', 'nav-prof')" style="flex:1; background:var(--primary); color:white; border:none; padding:15px; border-radius:8px; font-weight:900;">SAQUE</button>
+            </div>
+            <button onclick="mudarPagina('extract', 'nav-prof')" style="width:100%; background:transparent; border:1px solid #333; color:white; padding:15px; border-radius:8px; font-weight:900; margin-top:15px;">🕒 VER EXTRATO</button>
+            <button onclick="location.reload()" style="margin-top:30px; background:none; border:1px solid red; color:red; padding:10px 30px; border-radius:5px; font-weight:900;">SAIR</button>
         </div>
     </main>
 
+    <main id="extract-page" class="page">
+        <div style="padding: 20px;">
+            <div onclick="mudarPagina('home', 'nav-home')" class="auth-logo logo-clickable" style="text-align:center; margin-bottom:20px;">Bahia<span>Fortune</span></div>
+            <h3 style="color:var(--primary); text-align:center;">MEU EXTRATO</h3>
+            <div id="extract-list" style="margin-top:20px;"><p style='text-align:center; font-size:10px; color:var(--text-gray);'>Sem transações.</p></div>
+            <button onclick="mudarPagina('profile', 'nav-prof')" class="btn-auth">VOLTAR</button>
+        </div>
+    </main>
+
+    <main id="vip-benefits-page" class="page">
+        <div style="padding: 20px;">
+            <div onclick="mudarPagina('home', 'nav-home')" class="auth-logo logo-clickable" style="text-align:center; margin-bottom:20px;">Bahia<span>Fortune</span></div>
+            <h3 style="color:var(--primary); text-align:center; margin-bottom:20px;">BENEFÍCIOS VIP</h3>
+            <div class="vip-info-card"><span class="badge-vip" style="background:var(--bronze)">BRONZE</span><table class="vip-table"><tr><td>Bônus Depósito</td><td>10%</td></tr><tr><td>Saque Diário</td><td>R$ 1k</td></tr></table></div>
+            <div class="vip-info-card"><span class="badge-vip" style="background:var(--silver)">PRATA</span><table class="vip-table"><tr><td>Bônus Depósito</td><td>20%</td></tr><tr><td>Saque Diário</td><td>R$ 5k</td></tr></table></div>
+            <div class="vip-info-card"><span class="badge-vip" style="background:var(--gold)">OURO</span><table class="vip-table"><tr><td>Bônus Depósito</td><td>50%</td></tr><tr><td>Suporte VIP</td><td>Sim</td></tr></table></div>
+            <div class="vip-info-card" style="border-color:var(--primary)"><span class="badge-vip" style="background:var(--primary)">BAHIA VIP</span><table class="vip-table"><tr><td>Cashback</td><td>10% Semanal</td></tr><tr><td>Gerente</td><td>Exclusivo</td></tr></table></div>
+            <button onclick="mudarPagina('profile', 'nav-prof')" class="btn-auth">VOLTAR AO PERFIL</button>
+        </div>
+    </main>
+
+    <main id="refer-page" class="page">
+        <div style="padding: 20px;">
+            <div onclick="mudarPagina('home', 'nav-home')" class="auth-logo logo-clickable" style="text-align:center; margin-bottom:20px;">Bahia<span>Fortune</span></div>
+            <h3 style="color:var(--primary); text-align:center;">INDIQUE UM AMIGO</h3>
+            <div class="refer-card">
+                <p style="font-size: 12px;">Ganhe <b>R$ 5,00</b> por indicação!</p>
+                <div id="my-refer-link" style="background:#000; padding:15px; border-radius:8px; color:var(--green); font-size:10px; margin:15px 0; word-break:break-all;">...</div>
+                <button onclick="copiarLink()" class="btn-auth" style="background:var(--green); color:black;">COPIAR LINK</button>
+            </div>
+            <button onclick="mudarPagina('profile', 'nav-prof')" class="btn-auth">VOLTAR AO PERFIL</button>
+        </div>
+    </main>
+
+    <main id="deposit-page" class="page">
+        <div class="finance-card">
+            <h3>RECARGA PIX ⚡</h3>
+            <div class="values-grid">
+                <div class="val-opt" onclick="setVal(this, 10)">R$ 10</div>
+                <div class="val-opt" onclick="setVal(this, 20)">R$ 20</div>
+                <div class="val-opt" onclick="setVal(this, 50)">R$ 50</div>
+                <div class="val-opt" onclick="setVal(this, 100)">R$ 100</div>
+            </div>
+            <div class="input-finance-wrapper"><input type="number" id="val-dep" class="input-finance" placeholder="VALOR"></div>
+            <button onclick="confirmarDep()" class="btn-auth" style="background:var(--green); color:black;">GERAR PIX</button>
+        </div>
+    </main>
+
+    <main id="withdraw-page" class="page">
+        <div class="finance-card">
+            <h3 style="color:var(--primary)">SAQUE PIX</h3>
+            <select id="tipo-pix" style="width:100%; padding:15px; background:#2b2f36; border:none; color:white; border-radius:8px; margin-bottom:12px; font-weight:700;">
+                <option value="cpf">CPF</option>
+                <option value="email">E-mail</option>
+                <option value="tel">Telefone</option>
+                <option value="ale">Chave Aleatória</option>
+            </select>
+            <input type="text" class="input-finance" placeholder="CHAVE PIX" style="padding-left:15px; margin-bottom:15px; width:100%; background:#000; border:1px solid #333; color:white; border-radius:8px; padding:15px;">
+            <div class="input-finance-wrapper"><input type="number" id="val-saque" class="input-finance" placeholder="VALOR"></div>
+            <button onclick="processarSaque()" class="btn-auth">SACAR AGORA</button>
+        </div>
+    </main>
+
+    <div id="bonus-modal">
+        <div style="background:var(--card-bg); padding:30px; border-radius:20px; border:2px solid var(--primary); text-align:center; width:80%; max-width:300px; position:relative;">
+            <span onclick="fecharBonus()" style="position:absolute; top:10px; right:15px; font-size:24px; cursor:pointer;">&times;</span>
+            <h2 style="color:var(--primary)">AXÉ DA SORTE!</h2>
+            <p id="bonus-text" style="font-size:12px;"></p>
+            <button onclick="fecharBonus(); mudarPagina('deposit', 'nav-dep');" style="width:100%; background:var(--green); border:none; padding:15px; border-radius:8px; font-weight:900; margin-top:15px;">RESGATAR BÔNUS</button>
+        </div>
+    </div>
+
+    <div id="chat-window">
+        <div style="background:var(--primary); padding:10px; display:flex; justify-content:space-between; font-weight:900; font-size:11px;"><span>SUPORTE</span><span onclick="toggleChat()" style="cursor:pointer;">&times;</span></div>
+        <div id="chat-msgs" style="flex:1; padding:10px; overflow-y:auto; font-size:11px; display:flex; flex-direction:column; gap:8px;"></div>
+        <div style="padding:8px; display:flex; gap:5px;"><input type="text" id="chat-in" style="flex:1; background:#000; color:white; border:1px solid #333; padding:5px;"><button onclick="sendMsg()" style="background:var(--primary); border:none; color:white; padding:5px;">ENVIAR</button></div>
+    </div>
+    <div id="btn-suporte-fixo" onclick="toggleChat()" style="position:fixed; bottom:85px; right:20px; width:50px; height:50px; background:var(--primary); border-radius:50%; display:none; align-items:center; justify-content:center; z-index:1000; font-size:24px;">💬</div>
+
     <nav class="bottom-nav" id="main-nav">
-        <button class="nav-item active" onclick="mudarPagina('home', 'nav-home')">🏠<br>Home</button>
-        <button class="nav-item" onclick="location.reload()">🚪<br>Sair</button>
+        <button class="nav-item active" id="nav-home" onclick="mudarPagina('home', 'nav-home')">🏠<br>Home</button>
+        <button class="nav-item" id="nav-dep" onclick="mudarPagina('deposit', 'nav-dep')">💰<br>Depósito</button>
+        <button class="nav-item" id="nav-prof" onclick="mudarPagina('profile', 'nav-prof')">👤<br>Perfil</button>
     </nav>
 
-    <div id="game-overlay"><div style="background:#181a20; padding:10px; display:flex; justify-content:space-between;"><button onclick="fecharJogo()" style="background:var(--red); border:none; color:white; padding:8px 15px; border-radius:5px; font-weight:900;">SAIR</button><div style="color:var(--green); font-weight:900;">R$ <span class="saldo-dinamico">0.00</span></div></div><iframe id="game-iframe" style="flex:1; border:none;"></iframe></div>
+    <div id="game-overlay"><div style="background:#181a20; padding:10px; display:flex; justify-content:space-between; border-bottom:2px solid var(--primary);"><button onclick="fecharJogo()" style="background:var(--red); border:none; color:white; padding:8px 15px; border-radius:5px; font-weight:900;">SAIR</button><div style="color:var(--green); font-weight:900;">R$ <span class="saldo-dinamico">0.00</span></div><button onclick="abrirDepRapido()" style="background:var(--green); border:none; padding:8px 15px; border-radius:5px; font-weight:900;">+ DEP</button></div><iframe id="game-iframe" style="flex:1; border:none; width:100%;"></iframe></div>
 
     <script>
+        // CONFIGURAÇÃO SUPABASE
         const SUPABASE_URL = 'https://zqvfnykxwlcozvawqgrn.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxdmZueWt4d2xjb3p2YXdxZ3JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3NDkzNDQsImV4cCI6MjA4NTMyNTM0NH0.CevpF9vP4748mb2vFNsOp5Kq6u7Nfp_100bJcW7ogUQ';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let isLogged = false; let modoAuth = 'login'; let currentBanner = 0;
+        let saldo = 0; let isLogged = false; let modoAuth = 'login'; let xp = 0; let transacoes = []; let notificacoes = []; let currentBanner = 0;
+        const names = ["A***_bet", "Lu***_77", "Sorte***", "Baiano***", "Bet***"];
 
         function alternarAuth() {
-            const titulo = document.getElementById('auth-title');
-            const btn = document.getElementById('btn-auth-main');
-            const toggleText = document.getElementById('toggle-auth');
-            const campoCpf = document.getElementById('group-cpf');
-            const campoEmail = document.getElementById('group-email');
-
+            const t = document.getElementById('auth-title'); const b = document.getElementById('btn-auth-main'); const tx = document.getElementById('toggle-auth');
+            const c = document.getElementById('group-cpf'); const e = document.getElementById('group-email');
             if (modoAuth === 'login') {
-                modoAuth = 'cadastro';
-                titulo.innerText = "CRIE SUA CONTA GRÁTIS";
-                btn.innerText = "Finalizar Cadastro";
-                toggleText.innerHTML = 'Já tem conta? <span style="color: var(--primary); font-weight: 900;">FAÇA LOGIN</span>';
-                campoCpf.style.display = 'block'; campoEmail.style.display = 'block';
+                modoAuth = 'cadastro'; t.innerText = "CRIE SUA CONTA"; b.innerText = "Finalizar Cadastro";
+                tx.innerHTML = 'Já tem conta? <span style="color: var(--primary); font-weight: 900;">FAÇA LOGIN</span>';
+                c.style.display = 'block'; e.style.display = 'block';
             } else {
-                modoAuth = 'login';
-                titulo.innerText = "ACESSE SUA CONTA";
-                btn.innerText = "Entrar na Banca";
-                toggleText.innerHTML = 'Não tem conta? <span style="color: var(--primary); font-weight: 900;">CADASTRE-SE AQUI</span>';
-                campoCpf.style.display = 'none'; campoEmail.style.display = 'none';
+                modoAuth = 'login'; t.innerText = "ACESSE SUA CONTA"; b.innerText = "Entrar na Banca";
+                tx.innerHTML = 'Não tem conta? <span style="color: var(--primary); font-weight: 900;">CADASTRE-SE AQUI</span>';
+                c.style.display = 'none'; e.style.display = 'none';
             }
         }
 
         async function processarAuth() {
-            const u = document.getElementById('reg-user').value;
-            const s = document.getElementById('reg-pass').value;
-            if (!u || s.length < 4) return alert("Preencha os dados corretamente!");
-
+            const u = document.getElementById('reg-user').value; const s = document.getElementById('reg-pass').value;
+            if (!u || s.length < 4) return alert("Preencha usuário e senha!");
             if (modoAuth === 'cadastro') {
-                const e = document.getElementById('reg-email').value;
-                const c = document.getElementById('reg-cpf').value;
+                const e = document.getElementById('reg-email').value; const c = document.getElementById('reg-cpf').value;
+                if (!e.includes('@')) return alert("Email inválido!");
                 const { error } = await supabaseClient.from('usuarios').insert([{ username: u, email: e, cpf: c, senha: s, saldo: 0 }]);
                 if (error) return alert("Erro no Cadastro: " + error.message);
-                alert("Cadastro realizado! Faça login agora.");
-                alternarAuth();
+                alert("Cadastrado! Faça login."); alternarAuth();
             } else {
                 const { data, error } = await supabaseClient.from('usuarios').select('*').eq('username', u).eq('senha', s).single();
                 if (error || !data) return alert("Usuário ou senha inválidos!");
@@ -340,26 +718,51 @@
         }
 
         function logarUsuario(user) {
-            isLogged = true;
+            isLogged = true; saldo = user.saldo;
             document.getElementById('main-header').style.display = 'flex';
             document.getElementById('main-nav').style.display = 'flex';
+            document.getElementById('btn-suporte-fixo').style.display = 'flex';
             document.getElementById('register-page').classList.remove('active');
             document.getElementById('home-page').classList.add('active');
-            document.querySelectorAll('.saldo-dinamico').forEach(el => el.innerText = user.saldo.toFixed(2));
-            alert("Bem-vindo, " + user.username + "!");
+            document.getElementById('user-disp').innerText = user.username.toUpperCase();
+            document.getElementById('bonus-text').innerHTML = `Olá <b>${user.username}</b>! Dobre seu saldo com <b>BAHIA777</b>!`;
+            document.getElementById('bonus-modal').style.display = 'flex';
+            document.getElementById('my-refer-link').innerText = `bahiafortune.bet/convite/${user.username.toLowerCase()}`;
+            document.querySelectorAll('.saldo-dinamico').forEach(e => e.innerText = saldo.toFixed(2));
+            atualizarVip(); updateGainBar();
             setInterval(() => {
                 currentBanner = (currentBanner + 1) % 3;
-                document.getElementById('track').style.transform = `translateX(-${currentBanner * (100 / 3)}%)`;
+                const track = document.getElementById('track'); const dots = document.querySelectorAll('.dot');
+                if (track) track.style.transform = `translateX(-${currentBanner * (100 / 3)}%)`;
+                dots.forEach((dot, index) => dot.classList.toggle('active', index === currentBanner));
             }, 5000);
         }
 
-        function mudarPagina(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id + '-page').classList.add('active');
-        }
+        function moveCarousel() { /* Removido para evitar duplicidade com o intervalo no logarUsuario */ }
+        function updateGainBar() { if (!isLogged) return; document.getElementById('winner-name').innerText = names[Math.floor(Math.random() * names.length)]; document.getElementById('winner-val').innerText = (Math.random() * 150 + 20).toFixed(2); }
+        setInterval(updateGainBar, 5000);
 
+        function mudarPagina(id, navId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(id + '-page').classList.add('active');
+            if (document.getElementById(navId)) document.getElementById(navId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+        function toggleNotif() { const p = document.getElementById('notif-panel'); p.style.display = p.style.display === 'flex' ? 'none' : 'flex'; }
+        function toggleChat() { const w = document.getElementById('chat-window'); w.style.display = w.style.display === 'flex' ? 'none' : 'flex'; if (w.style.display === 'flex') document.getElementById('chat-msgs').innerHTML = '<div style="background:#2b2f36; padding:8px; border-radius:8px;">Suporte Online. Como podemos ajudar?</div>'; }
+        function sendMsg() { const i = document.getElementById('chat-in'); if (i.value === "") return; document.getElementById('chat-msgs').innerHTML += `<div style="align-self:flex-end; background:var(--primary); padding:8px; border-radius:8px; margin-top:5px;">${i.value}</div>`; i.value = ""; }
+        function mascaraCPF(i) { let v = i.value.replace(/\D/g, ""); if (v.length <= 11) { v = v.replace(/(\d{3})(\d)/, "$1.$2"); v = v.replace(/(\d{3})(\d)/, "$1.$2"); v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2"); } i.value = v; }
+        function setVal(el, v) { document.querySelectorAll('.val-opt').forEach(o => o.classList.remove('active')); el.classList.add('active'); document.getElementById('val-dep').value = v; }
+        function atualizarS() { document.querySelectorAll('.saldo-dinamico').forEach(e => e.innerText = saldo.toFixed(2)); }
+        function confirmarDep() { let v = parseFloat(document.getElementById('val-dep').value); if (isNaN(v) || v < 10) return; saldo += v; atualizarS(); mudarPagina('home', 'nav-home'); }
+        function processarSaque() { let v = parseFloat(document.getElementById('val-saque').value); if (v > saldo || v < 20) return alert("Erro no saque!"); saldo -= v; atualizarS(); }
+        function atualizarVip() { const bar = document.getElementById('vip-progress'); const badge = document.getElementById('vip-badge'); let level = "Bronze"; if (xp >= 100) level = "Prata"; badge.innerText = level; bar.style.width = (xp % 100) + "%"; }
+        function fecharBonus() { document.getElementById('bonus-modal').style.display = 'none'; }
+        function copiarLink() { const link = document.getElementById('my-refer-link').innerText; navigator.clipboard.writeText(link); alert("Link copiado!"); }
         function abrirJogo(u) { document.getElementById('game-iframe').src = u; document.getElementById('game-overlay').style.display = 'flex'; }
         function fecharJogo() { document.getElementById('game-overlay').style.display = 'none'; document.getElementById('game-iframe').src = ""; }
+        function abrirDepRapido() { fecharJogo(); mudarPagina('deposit', 'nav-dep'); }
     </script>
 </body>
 </html>
