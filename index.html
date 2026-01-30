@@ -31,6 +31,49 @@
             overflow-x: hidden;
         }
 
+        /* --- NOVO: CSS DO TOAST NEON PARA REFINAMENTO --- */
+        .toast-banca {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e2329;
+            border: 1px solid var(--primary);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 12px;
+            z-index: 10000;
+            box-shadow: 0 0 20px rgba(255,0,127,0.4);
+            animation: slideDown 0.5s ease, fadeOut 0.5s ease 2.5s forwards;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @keyframes slideDown {
+            from {
+                top: -50px;
+                opacity: 0;
+            }
+
+            to {
+                top: 20px;
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
         /* --- BLINDAGEM HEADER --- */
         #main-header {
             display: none;
@@ -696,6 +739,15 @@
         let saldo = 0; let isLogged = false; let modoAuth = 'login'; let xp = 0; let transacoes = []; let notificacoes = []; let currentBanner = 0;
         const names = ["A***_bet", "Lu***_77", "Sorte***", "Baiano***", "Bet***"];
 
+        // --- NOVO: FUNÇÃO DE NOTIFICAÇÃO ESTILIZADA ---
+        function notificarErro(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'toast-banca';
+            toast.innerHTML = `⚠️ <span>${msg}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
         function alternarAuth() {
             const t = document.getElementById('auth-title'); const b = document.getElementById('btn-auth-main'); const tx = document.getElementById('toggle-auth');
             const c = document.getElementById('group-cpf'); const e = document.getElementById('group-email');
@@ -712,16 +764,16 @@
 
         async function processarAuth() {
             const u = document.getElementById('reg-user').value; const s = document.getElementById('reg-pass').value;
-            if (!u || s.length < 4) return alert("Preencha usuário e senha!");
+            if (!u || s.length < 4) return notificarErro("Preencha usuário e senha!");
             if (modoAuth === 'cadastro') {
                 const e = document.getElementById('reg-email').value; const c = document.getElementById('reg-cpf').value;
-                if (!e.includes('@')) return alert("Email inválido!");
+                if (!e.includes('@')) return notificarErro("Email inválido!");
                 const { error } = await supabaseClient.from('usuarios').insert([{ username: u, email: e, cpf: c, senha: s, saldo: 0 }]);
-                if (error) return alert("Erro no Cadastro: " + error.message);
-                alert("Cadastrado! Faça login."); alternarAuth();
+                if (error) return notificarErro("Erro no Cadastro.");
+                notificarErro("Sucesso! Logue agora."); alternarAuth();
             } else {
                 const { data, error } = await supabaseClient.from('usuarios').select('*').eq('username', u).eq('senha', s).single();
-                if (error || !data) return alert("Usuário ou senha inválidos!");
+                if (error || !data) return notificarErro("Login incorreto!");
                 logarUsuario(data);
             }
         }
@@ -750,34 +802,33 @@
         function updateGainBar() { if (!isLogged) return; document.getElementById('winner-name').innerText = names[Math.floor(Math.random() * names.length)]; document.getElementById('winner-val').innerText = (Math.random() * 150 + 20).toFixed(2); }
         setInterval(updateGainBar, 5000);
 
-        // --- NOVA FUNÇÃO DE DEPÓSITO COM CHECKOUT VISUAL ---
         function confirmarDep() {
             let v = parseFloat(document.getElementById('val-dep').value);
-            if (isNaN(v) || v < 10) return alert("Valor mínimo R$ 10,00");
+            if (isNaN(v) || v < 10) return notificarErro("Mínimo R$ 10,00");
 
             const checkoutHTML = `
-                        <div id="pix-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10000; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(5px);">
-                            <div style="background:#1e2329; border:1px solid var(--primary); border-radius:20px; width:100%; max-width:350px; padding:30px; text-align:center; box-shadow: 0 0 20px rgba(255,0,127,0.2);">
-                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                                    <span style="color:var(--primary); font-weight:900; font-size:14px;">PAGAMENTO SEGURO</span>
-                                    <span onclick="fecharCheckout()" style="cursor:pointer; font-size:20px; color:var(--text-gray);">&times;</span>
-                                </div>
-                                <p style="font-size:12px; color:var(--text-gray); margin-bottom:5px;">VALOR A PAGAR</p>
-                                <h2 style="margin:0; color:var(--green); font-size:28px;">R$ ${v.toFixed(2)}</h2>
-                                <div id="qr-area" style="background:white; width:180px; height:180px; margin:25px auto; border-radius:12px; display:flex; align-items:center; justify-content:center; padding:10px;">
-                                    <div style="text-align:center; color:#000;">
-                                        <div class="loader-pix"></div>
-                                        <p style="font-size:9px; font-weight:900; margin-top:10px;">GERANDO QR CODE...</p>
-                                    </div>
-                                </div>
-                                <button onclick="copiarPixReal()" style="width:100%; background:var(--primary); color:white; border:none; padding:15px; border-radius:10px; font-weight:900; font-size:13px; cursor:pointer; margin-bottom:15px;">COPIAR CÓDIGO PIX</button>
-                                <div style="display:flex; align-items:center; justify-content:center; gap:10px; color:var(--text-gray); font-size:11px;">
-                                    <span id="timer-pix">05:00</span>
-                                    <span>Aguardando pagamento...</span>
+                    <div id="pix-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10000; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(5px);">
+                        <div style="background:#1e2329; border:1px solid var(--primary); border-radius:20px; width:100%; max-width:350px; padding:30px; text-align:center; box-shadow: 0 0 20px rgba(255,0,127,0.2);">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                                <span style="color:var(--primary); font-weight:900; font-size:14px;">PAGAMENTO SEGURO</span>
+                                <span onclick="fecharCheckout()" style="cursor:pointer; font-size:20px; color:var(--text-gray);">&times;</span>
+                            </div>
+                            <p style="font-size:12px; color:var(--text-gray); margin-bottom:5px;">VALOR A PAGAR</p>
+                            <h2 style="margin:0; color:var(--green); font-size:28px;">R$ ${v.toFixed(2)}</h2>
+                            <div id="qr-area" style="background:white; width:180px; height:180px; margin:25px auto; border-radius:12px; display:flex; align-items:center; justify-content:center; padding:10px;">
+                                <div style="text-align:center; color:#000;">
+                                    <div class="loader-pix"></div>
+                                    <p style="font-size:9px; font-weight:900; margin-top:10px;">GERANDO QR CODE...</p>
                                 </div>
                             </div>
+                            <button onclick="copiarPixReal()" style="width:100%; background:var(--primary); color:white; border:none; padding:15px; border-radius:10px; font-weight:900; font-size:13px; cursor:pointer; margin-bottom:15px;">COPIAR CÓDIGO PIX</button>
+                            <div style="display:flex; align-items:center; justify-content:center; gap:10px; color:var(--text-gray); font-size:11px;">
+                                <span id="timer-pix">05:00</span>
+                                <span>Aguardando pagamento...</span>
+                            </div>
                         </div>
-                    `;
+                    </div>
+                `;
             document.body.insertAdjacentHTML('beforeend', checkoutHTML);
             iniciarTimerPix();
         }
@@ -793,7 +844,21 @@
             }, 1000);
         }
 
-        function copiarPixReal() { alert("Código PIX copiado! Pague no seu banco."); }
+        function copiarPixReal() { notificarErro("Código PIX copiado!"); }
+
+        // --- NOVO: REFINAMENTO DE JOGOS (TRAVA DE SALDO) ---
+        function abrirJogo(u) {
+            if (!isLogged) return notificarErro("Faça login para jogar!");
+
+            if (saldo <= 0) {
+                notificarErro("Saldo insuficiente! Deposite para jogar.");
+                mudarPagina('deposit', 'nav-dep');
+                return;
+            }
+
+            document.getElementById('game-iframe').src = u;
+            document.getElementById('game-overlay').style.display = 'flex';
+        }
 
         function mudarPagina(id, navId) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -808,11 +873,10 @@
         function mascaraCPF(i) { let v = i.value.replace(/\D/g, ""); if (v.length <= 11) { v = v.replace(/(\d{3})(\d)/, "$1.$2"); v = v.replace(/(\d{3})(\d)/, "$1.$2"); v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2"); } i.value = v; }
         function setVal(el, v) { document.querySelectorAll('.val-opt').forEach(o => o.classList.remove('active')); el.classList.add('active'); document.getElementById('val-dep').value = v; }
         function atualizarS() { document.querySelectorAll('.saldo-dinamico').forEach(e => e.innerText = saldo.toFixed(2)); }
-        function processarSaque() { let v = parseFloat(document.getElementById('val-saque').value); if (v > saldo || v < 20) return alert("Erro no saque!"); saldo -= v; atualizarS(); }
+        function processarSaque() { let v = parseFloat(document.getElementById('val-saque').value); if (v > saldo || v < 20) return notificarErro("Erro no saque!"); saldo -= v; atualizarS(); }
         function atualizarVip() { const bar = document.getElementById('vip-progress'); const badge = document.getElementById('vip-badge'); let level = "Bronze"; if (xp >= 100) level = "Prata"; badge.innerText = level; bar.style.width = (xp % 100) + "%"; }
         function fecharBonus() { document.getElementById('bonus-modal').style.display = 'none'; }
-        function copiarLink() { const link = document.getElementById('my-refer-link').innerText; navigator.clipboard.writeText(link); alert("Link copiado!"); }
-        function abrirJogo(u) { document.getElementById('game-iframe').src = u; document.getElementById('game-overlay').style.display = 'flex'; }
+        function copiarLink() { const link = document.getElementById('my-refer-link').innerText; navigator.clipboard.writeText(link); notificarErro("Link copiado!"); }
         function fecharJogo() { document.getElementById('game-overlay').style.display = 'none'; document.getElementById('game-iframe').src = ""; }
         function abrirDepRapido() { fecharJogo(); mudarPagina('deposit', 'nav-dep'); }
     </script>
