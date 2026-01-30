@@ -799,7 +799,26 @@
             }, 5000);
         }
 
-        function updateGainBar() { if (!isLogged) return; document.getElementById('winner-name').innerText = names[Math.floor(Math.random() * names.length)]; document.getElementById('winner-val').innerText = (Math.random() * 150 + 20).toFixed(2); }
+        const listaGanhadores = [
+            { n: "A***_bet", v: 42.50, j: "Fortune Tiger" },
+            { n: "M***_Sorte", v: 125.80, j: "Fortune Ox" },
+            { n: "Bahia***_7", v: 89.25, j: "Fortune Rabbit" },
+            { n: "R***_Luck", v: 12.00, j: "Cash Mania" },
+            { n: "Sorte***_X", v: 55.12, j: "Fortune Tiger" },
+            { n: "L***_Ganhos", v: 310.40, j: "Fortune Ox" },
+            { n: "User***_99", v: 15.00, j: "Cash Mania" },
+            { n: "T***_Winner", v: 72.33, j: "Fortune Rabbit" },
+            { n: "Axé***_Bet", v: 218.90, j: "Fortune Tiger" },
+            { n: "G***_Sorte", v: 41.50, j: "Fortune Ox" }
+        ];
+
+        function updateGainBar() {
+            if (!isLogged) return;
+            const content = document.querySelector('.gain-content');
+            if (!content) return;
+            const ganhador = listaGanhadores[Math.floor(Math.random() * listaGanhadores.length)];
+            content.innerHTML = `<span style="color:var(--primary)">●</span> <span>${ganhador.n}</span> ganhou <span style="color:var(--green)">R$ ${ganhador.v.toFixed(2)}</span> no ${ganhador.j}`;
+        }
         setInterval(updateGainBar, 5000);
 
         function confirmarDep() {
