@@ -725,7 +725,7 @@
                 <button onclick="mudarPagina('withdraw', 'nav-prof')" style="flex:1; background:var(--primary); color:white; border:none; padding:15px; border-radius:8px; font-weight:900;">SAQUE</button>
             </div>
             <button onclick="mudarPagina('extract', 'nav-prof')" style="width:100%; background:transparent; border:1px solid #333; color:white; padding:15px; border-radius:8px; font-weight:900; margin-top:15px;">🕒 VER EXTRATO</button>
-            <button onclick="location.reload()" style="margin-top:30px; background:none; border:1px solid red; color:red; padding:10px 30px; border-radius:5px; font-weight:900;">SAIR</button>
+            <button onclick="fazerLogout()" style="margin-top:30px; background:none; border:1px solid red; color:red; padding:10px 30px; border-radius:5px; font-weight:900;">SAIR</button>
         </div>
     </main>
 
@@ -849,8 +849,13 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxdmZueWt4d2xjb3p2YXdxZ3JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3NDkzNDQsImV4cCI6MjA4NTMyNTM0NH0.CevpF9vP4748mb2vFNsOp5Kq6u7Nfp_100bJcW7ogUQ';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let saldo = 0; let isLogged = false; let modoAuth = 'login'; let xp = 0; let transacoes = []; let notificacoes = []; let currentBanner = 0;
-        const names = ["A***_bet", "Lu***_77", "Sorte***", "Baiano***", "Bet***"];
+        let saldo = 0; let isLogged = false; let modoAuth = 'login'; let xp = 0; let currentBanner = 0;
+
+        // --- AUTENTICAÇÃO E SESSÃO ---
+        function fazerLogout() {
+            localStorage.removeItem('bahia_user');
+            location.reload();
+        }
 
         function alternarAuth() {
             const titulo = document.getElementById('auth-title');
@@ -876,7 +881,6 @@
             }
         }
 
-        // 2. FUNÇÃO PARA ENVIAR OS DADOS AO BANCO
         async function processarAuth() {
             const u = document.getElementById('reg-user').value;
             const s = document.getElementById('reg-pass').value;
@@ -886,43 +890,24 @@
             if (modoAuth === 'cadastro') {
                 const e = document.getElementById('reg-email').value;
                 const c = document.getElementById('reg-cpf').value;
-
                 if (!e || !c) return notificarErro("Preencha todos os campos!");
-                if (!e.includes('@')) return notificarErro("Email inválido!");
 
-                const { error } = await supabaseClient
-                    .from('usuarios')
-                    .insert([{
-                        username: u,
-                        email: e,
-                        cpf: c,
-                        senha: s,
-                        saldo: 0,
-                        banido: false,
-                        xp: 0
-                    }]);
+                const { error } = await supabaseClient.from('usuarios').insert([{
+                    username: u, email: e, cpf: c, senha: s, saldo: 0, banido: false, xp: 0
+                }]);
 
-                if (error) return notificarErro("Erro! Usuário ou CPF já cadastrados.");
-
-                alert("Cadastro realizado com sucesso! Faça login.");
-                alternarAuth(); // Volta para a tela de login
+                if (error) return notificarErro("Usuário ou CPF já cadastrados!");
+                alert("Cadastro realizado! Faça seu login.");
+                alternarAuth();
             } else {
-                // Lógica de Login (que você já tem)
-                const { data, error } = await supabaseClient
-                    .from('usuarios')
-                    .select('*')
-                    .eq('username', u)
-                    .eq('senha', s)
-                    .single();
-
+                const { data, error } = await supabaseClient.from('usuarios').select('*').eq('username', u).eq('senha', s).single();
                 if (error || !data) return notificarErro("Login incorreto!");
                 if (data.banido) return alert("Sua conta está suspensa!");
-
                 logarUsuario(data);
             }
         }
 
-        // --- NOVO: FUNÇÃO DE NOTIFICAÇÃO ESTILIZADA ---
+        // --- INTERFACE ---
         function notificarErro(msg) {
             const toast = document.createElement('div');
             toast.className = 'toast-banca';
@@ -931,192 +916,73 @@
             setTimeout(() => toast.remove(), 3000);
         }
 
-        // --- FUNÇÃO DE LOGIN E CADASTRO (COM TRAVA DE BANIMENTO) ---
-        async function processarAuth() {
-            const u = document.getElementById('reg-user').value;
-            const s = document.getElementById('reg-pass').value;
-
-            if (!u || s.length < 4) return notificarErro("Preencha usuário e senha!");
-
-            if (modoAuth === 'cadastro') {
-                // --- LÓGICA DE CADASTRO ---
-                const e = document.getElementById('reg-email').value;
-                const c = document.getElementById('reg-cpf').value;
-
-                if (!e.includes('@')) return notificarErro("Email inválido!");
-
-                // Cria usuário já com banido = false
-                const { error } = await supabaseClient
-                    .from('usuarios')
-                    .insert([{ username: u, email: e, cpf: c, senha: s, saldo: 0, banido: false }]);
-
-                if (error) return notificarErro("Erro no Cadastro (Usuário já existe?)");
-
-                notificarErro("Sucesso! Logue agora.");
-                alternarAuth();
-
-            } else {
-                // --- LÓGICA DE LOGIN ---
-                const { data, error } = await supabaseClient
-                    .from('usuarios')
-                    .select('*')
-                    .eq('username', u)
-                    .eq('senha', s)
-                    .single();
-
-                if (error || !data) return notificarErro("Login incorreto!");
-
-                // 🔒 AQUI ESTÁ A TRAVA DE SEGURANÇA 🔒
-                if (data.banido === true) {
-                    alert("🚫 ACESSO NEGADO\n\nSua conta foi suspensa pela administração.\nEntre em contato com o suporte.");
-                    return; // O código para aqui e não deixa entrar
-                }
-
-                // Se não estiver banido, entra normal
-                logarUsuario(data);
-            }
-        }
-
         function logarUsuario(user) {
-            salvarSessao(user);
-            iniciarSuporteAtivo();
-            atualizarContadorAmigos(user.username);
-            xp = user.xp || 0;
-            ganharXP(0);
-            isLogged = true; saldo = user.saldo;
+            localStorage.setItem('bahia_user', JSON.stringify(user));
+            isLogged = true; saldo = user.saldo; xp = user.xp || 0;
             document.getElementById('main-header').style.display = 'flex';
             document.getElementById('main-nav').style.display = 'flex';
             document.getElementById('btn-suporte-fixo').style.display = 'flex';
             document.getElementById('register-page').classList.remove('active');
             document.getElementById('home-page').classList.add('active');
             document.getElementById('user-disp').innerText = user.username.toUpperCase();
-            document.getElementById('bonus-text').innerHTML = `Olá <b>${user.username}</b>! Dobre seu saldo com <b>BAHIA777</b>!`;
-            document.getElementById('bonus-modal').style.display = 'flex';
-            document.getElementById('my-refer-link').innerText = `bahiafortune.bet/convite/${user.username.toLowerCase()}`;
+            atualizarS();
+            iniciarCarrossel();
+            iniciarSuporteAtivo();
+            atualizarContadorAmigos(user.username);
+        }
+
+        function atualizarS() {
             document.querySelectorAll('.saldo-dinamico').forEach(e => e.innerText = saldo.toFixed(2));
-            atualizarVip(); updateGainBar();
-            setInterval(() => {
-                currentBanner = (currentBanner + 1) % 3;
-                const track = document.getElementById('track'); const dots = document.querySelectorAll('.dot');
-                if (track) track.style.transform = `translateX(-${currentBanner * (100 / 3)}%)`;
-                dots.forEach((dot, index) => dot.classList.toggle('active', index === currentBanner));
-            }, 5000);
         }
 
-        const listaGanhadores = [
-            { n: "A***_bet", v: 42.50, j: "Fortune Tiger" },
-            { n: "M***_Sorte", v: 125.80, j: "Fortune Ox" },
-            { n: "Bahia***_7", v: 89.25, j: "Fortune Rabbit" },
-            { n: "R***_Luck", v: 12.00, j: "Cash Mania" },
-            { n: "Sorte***_X", v: 55.12, j: "Fortune Tiger" },
-            { n: "L***_Ganhos", v: 310.40, j: "Fortune Ox" },
-            { n: "User***_99", v: 15.00, j: "Cash Mania" },
-            { n: "T***_Winner", v: 72.33, j: "Fortune Rabbit" },
-            { n: "Axé***_Bet", v: 218.90, j: "Fortune Tiger" },
-            { n: "G***_Sorte", v: 41.50, j: "Fortune Ox" }
-        ];
-
-        function updateGainBar() {
-            if (!isLogged) return;
-            const content = document.querySelector('.gain-content');
-            if (!content) return;
-            const ganhador = listaGanhadores[Math.floor(Math.random() * listaGanhadores.length)];
-            content.innerHTML = `<span style="color:var(--primary)">●</span> <span>${ganhador.n}</span> ganhou <span style="color:var(--green)">R$ ${ganhador.v.toFixed(2)}</span> no ${ganhador.j}`;
-        }
-        setInterval(updateGainBar, 5000);
-
+        // --- FINANCEIRO ---
         function confirmarDep() {
-    let v = parseFloat(document.getElementById('val-dep').value);
-    if (isNaN(v) || v < 10) return notificarErro("Mínimo R$ 10,00");
+            let v = parseFloat(document.getElementById('val-dep').value);
+            if (isNaN(v) || v < 10) return notificarErro("Mínimo R$ 10,00");
 
-    const checkoutHTML = `
-    <div id="pix-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10000; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(5px);">
-        <div style="background:#1e2329; border:1px solid var(--primary); border-radius:20px; width:100%; max-width:350px; padding:25px; text-align:center;">
-            
-            <h3 style="color:var(--primary); margin-bottom:15px;">PAGAMENTO PIX</h3>
-            
-            <div style="background:white; padding:10px; border-radius:10px; display:inline-block; margin-bottom:15px;">
-               <img src="https://i.ibb.co/jvHrsb5R/seu-qr-code.png" style="width:180px; height:180px; display:block; margin:0 auto;">
-            </div>
-
-            <p style="color:#ccc; font-size:11px; margin-bottom:5px;">Valor a transferir:</p>
-            <h2 style="color:var(--green); margin-top:0;">R$ ${v.toFixed(2)}</h2>
-
-            <button onclick="copiarChaveReal()" style="width:100%; background:var(--primary); color:white; border:none; padding:15px; border-radius:8px; font-weight:900; cursor:pointer; font-size:14px;">
-                CHAVE ALEATÓRIA
-            </button>
-            
-            <p style="color:var(--text-gray); font-size:10px; margin-top:8px; font-weight:bold;">
-                COPIE, COLE E FAÇA O PIX AQUI
-            </p>
-
-            <input type="text" value="7e20165a-677b-4edd-957d-8a665f550f46" id="input-pix-copia" style="position:absolute; left:-9999px;">
-
-            <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
-
-            <button onclick="avisarDepositoRealizado(${v})" style="width:100%; background:var(--green); border:none; padding:15px; border-radius:8px; font-weight:900; cursor:pointer; color:black;">JÁ FIZ O PAGAMENTO</button>
-            
-            <p onclick="fecharCheckout()" style="font-size:11px; color:#666; margin-top:15px; cursor:pointer;">Cancelar</p>
-        </div>
-    </div>
-`;
-    document.body.insertAdjacentHTML('beforeend', checkoutHTML);
-}
-
-// --- FUNÇÃO AUXILIAR DE DEPÓSITO (COLE LOGO ABAIXO DA ANTERIOR) ---
-function copiarChaveReal() {
-    const copyText = document.getElementById("input-pix-copia");
-    copyText.select();
-    navigator.clipboard.writeText(copyText.value);
-    notificarErro("Chave copiada! Vá ao seu banco.");
-}
-
-async function avisarDepositoRealizado(valor) {
-    const usuarioAtual = JSON.parse(localStorage.getItem('bahia_user')).username;
-
-    // Salva o pedido como 'pendente' no banco
-    const { error } = await supabaseClient
-        .from('transacoes')
-        .insert([{ 
-            usuario: usuarioAtual, 
-            tipo: 'deposito', 
-            valor: valor, 
-            status: 'pendente' 
-        }]);
-
-    if (!error) {
-        fecharCheckout();
-        alert("✅ Aviso enviado! Assim que o dinheiro cair na nossa conta, seu saldo será liberado automaticamente.");
-    } else {
-        notificarErro("Erro ao avisar. Verifique a tabela 'transacoes' no Supabase.");
-    }
-}
-
-        function fecharCheckout() { const m = document.getElementById('pix-modal'); if (m) m.remove(); }
-
-        function iniciarTimerPix() {
-            let tempo = 300; const d = document.getElementById('timer-pix');
-            const interval = setInterval(() => {
-                let min = Math.floor(tempo / 60); let sec = tempo % 60;
-                if (d) d.innerText = `${min < 10 ? '0' : ''}${min}:${sec < 10 ? '0' : ''}${sec}`;
-                if (--tempo < 0) { clearInterval(interval); if (d) d.innerText = "EXPIRADO"; }
-            }, 1000);
+            const checkoutHTML = `
+            <div id="pix-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10000; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(5px);">
+                <div style="background:#1e2329; border:1px solid var(--primary); border-radius:20px; width:100%; max-width:350px; padding:25px; text-align:center;">
+                    <h3 style="color:var(--primary);">PAGAMENTO PIX</h3>
+                    <div style="background:white; padding:10px; border-radius:10px; display:inline-block; margin-bottom:15px;">
+                       <img src="https://i.ibb.co/jvHrsb5R/seu-qr-code.png" style="width:180px; height:180px; display:block;">
+                    </div>
+                    <h2 style="color:var(--green);">R$ ${v.toFixed(2)}</h2>
+                    <button onclick="copiarChaveReal()" style="width:100%; background:var(--primary); color:white; border:none; padding:15px; border-radius:8px; font-weight:900;">COPIAR CHAVE</button>
+                    <input type="text" value="7e20165a-677b-4edd-957d-8a665f550f46" id="input-pix-copia" style="position:absolute; left:-9999px;">
+                    <button onclick="avisarDepositoRealizado(${v})" style="width:100%; background:var(--green); border:none; padding:15px; border-radius:8px; font-weight:900; margin-top:10px; color:black;">JÁ PAGUEI</button>
+                    <p onclick="document.getElementById('pix-modal').remove()" style="color:#666; margin-top:15px; cursor:pointer;">Cancelar</p>
+                </div>
+            </div>`;
+            document.body.insertAdjacentHTML('beforeend', checkoutHTML);
         }
 
-        function copiarPixReal() { notificarErro("Código PIX copiado!"); }
+        function copiarChaveReal() {
+            const copyText = document.getElementById("input-pix-copia");
+            copyText.select();
+            navigator.clipboard.writeText(copyText.value);
+            notificarErro("Chave copiada!");
+        }
 
-        // --- NOVO: REFINAMENTO DE JOGOS (TRAVA DE SALDO) ---
+        async function avisarDepositoRealizado(valor) {
+            const uData = localStorage.getItem('bahia_user');
+            const user = uData ? JSON.parse(uData).username : 'anonimo';
+            await supabaseClient.from('transacoes').insert([{ usuario: user, tipo: 'deposito', valor: valor, status: 'pendente' }]);
+            document.getElementById('pix-modal').remove();
+            alert("✅ Aviso enviado! Aguarde a aprovação.");
+        }
+
+        // --- OUTROS ---
         function abrirJogo(u) {
-            if (!isLogged) return notificarErro("Faça login para jogar!");
-
-            if (saldo <= 0) {
-                notificarErro("Saldo insuficiente! Deposite para jogar.");
-                mudarPagina('deposit', 'nav-dep');
-                return;
-            }
-
+            if (!isLogged) return notificarErro("Faça login!");
+            if (saldo <= 0) return notificarErro("Saldo insuficiente!");
             document.getElementById('game-iframe').src = u;
             document.getElementById('game-overlay').style.display = 'flex';
+        }
+
+        function fecharJogo() {
+            document.getElementById('game-overlay').style.display = 'none';
+            document.getElementById('game-iframe').src = "";
         }
 
         function mudarPagina(id, navId) {
@@ -1124,260 +990,102 @@ async function avisarDepositoRealizado(valor) {
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(id + '-page').classList.add('active');
             if (document.getElementById(navId)) document.getElementById(navId).classList.add('active');
-            window.scrollTo(0, 0);
-        }
-        function toggleNotif() { const p = document.getElementById('notif-panel'); p.style.display = p.style.display === 'flex' ? 'none' : 'flex'; }
-        function toggleChat() { const w = document.getElementById('chat-window'); w.style.display = w.style.display === 'flex' ? 'none' : 'flex'; if (w.style.display === 'flex') document.getElementById('chat-msgs').innerHTML = '<div style="background:#2b2f36; padding:8px; border-radius:8px;">Suporte Online. Como podemos ajudar?</div>'; }
-        function sendMsg() { const i = document.getElementById('chat-in'); if (i.value === "") return; document.getElementById('chat-msgs').innerHTML += `<div style="align-self:flex-end; background:var(--primary); padding:8px; border-radius:8px; margin-top:5px;">${i.value}</div>`; i.value = ""; }
-        function mascaraCPF(i) { let v = i.value.replace(/\D/g, ""); if (v.length <= 11) { v = v.replace(/(\d{3})(\d)/, "$1.$2"); v = v.replace(/(\d{3})(\d)/, "$1.$2"); v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2"); } i.value = v; }
-        function setVal(el, v) { document.querySelectorAll('.val-opt').forEach(o => o.classList.remove('active')); el.classList.add('active'); document.getElementById('val-dep').value = v; }
-        function atualizarS() { document.querySelectorAll('.saldo-dinamico').forEach(e => e.innerText = saldo.toFixed(2)); }
-        function processarSaque() { let v = parseFloat(document.getElementById('val-saque').value); if (v > saldo || v < 20) return notificarErro("Erro no saque!"); saldo -= v; atualizarS(); }
-        function atualizarVip() { const bar = document.getElementById('vip-progress'); const badge = document.getElementById('vip-badge'); let level = "Bronze"; if (xp >= 100) level = "Prata"; badge.innerText = level; bar.style.width = (xp % 100) + "%"; }
-        function fecharBonus() { document.getElementById('bonus-modal').style.display = 'none'; }
-        function copiarLink() { const link = document.getElementById('my-refer-link').innerText; navigator.clipboard.writeText(link); notificarErro("Link copiado!"); }
-        function fecharJogo() { document.getElementById('game-overlay').style.display = 'none'; document.getElementById('game-iframe').src = ""; }
-        function abrirDepRapido() { fecharJogo(); mudarPagina('deposit', 'nav-dep'); }
-
-        function salvarSessao(user) {
-            localStorage.setItem('bahia_user', JSON.stringify(user));
         }
 
         window.addEventListener('load', async () => {
             const salvo = localStorage.getItem('bahia_user');
             if (salvo) {
-                const dadosUser = JSON.parse(salvo);
-                const { data, error } = await supabaseClient.from('usuarios')
-                    .select('*')
-                    .eq('username', dadosUser.username)
-                    .eq('senha', dadosUser.senha)
-                    .single();
-                if (data && !error) {
-                    logarUsuario(data);
-                }
+                const d = JSON.parse(salvo);
+                const { data } = await supabaseClient.from('usuarios').select('*').eq('username', d.username).eq('senha', d.senha).single();
+                if (data && !data.banido) logarUsuario(data);
             }
         });
 
-        function iniciarSuporteAtivo() {
-            const mensagensSuporte = [
-                "Suporte: Olá! Sabia que depósitos via PIX caem em menos de 30 segundos? ⚡",
-                "Sistema: Verificamos que o Cupom BAHIA777 ainda está ativo para você!",
-                "Suporte: Precisa de ajuda com saques? Nossa equipe está online 24h.",
-                "Dica: Os jogos Fortune Tiger e Fortune Ox estão com alta taxa de bônus agora! 🐯"
-            ];
-
-            let indiceMsg = 0;
-
-            // Envia uma mensagem a cada 45 segundos para não poluir o chat
+        // Mantenha suas funções auxiliares (Admin, carrossel, suporte) abaixo...
+        function iniciarCarrossel() {
             setInterval(() => {
-                if (isLogged) {
-                    const chatMsgs = document.getElementById('chat-msgs');
-                    if (chatMsgs) {
-                        const msgDiv = document.createElement('div');
-                        // Estilo da mensagem do suporte (Bordinha rosa para destacar)
-                        msgDiv.style.cssText = "background:#2b2f36; padding:8px; border-radius:8px; margin-top:5px; border-left:3px solid var(--primary); font-style:italic; font-size:10px;";
-                        msgDiv.innerText = mensagensSuporte[indiceMsg];
-                        chatMsgs.appendChild(msgDiv);
-
-                        // Faz o chat rolar sozinho para a última mensagem
-                        chatMsgs.scrollTop = chatMsgs.scrollHeight;
-
-                        indiceMsg = (indiceMsg + 1) % mensagensSuporte.length;
-                    }
-                }
-            }, 45000);
+                currentBanner = (currentBanner + 1) % 3;
+                const track = document.getElementById('track');
+                if (track) track.style.transform = `translateX(-${currentBanner * (100 / 3)}%)`;
+            }, 5000);
         }
 
-        // --- SISTEMA DE CONTAGEM DE AMIGOS REAL ---
-        async function atualizarContadorAmigos(username) {
-            // Busca na tabela 'usuarios' quantos registros existem onde o 'username' (ou campo de indicação) bate
-            // Nota: Essa lógica assume que você tem um sistema de rastreio simples.
-            // Por agora, vamos buscar se o username do dono aparece em algum campo de indicação.
-
-            const { count, error } = await supabaseClient
-                .from('usuarios')
-                .select('*', { count: 'exact', head: true });
-            // Aqui depois podemos filtrar por .eq('indicado_por', username) quando criarmos esse campo.
-
-            const contadorHTML = document.querySelector('#refer-page h4');
-            if (contadorHTML) {
-                // Simulamos o número real ou mostramos o que veio do banco
-                contadorHTML.innerText = count ? count - 1 : 0; // -1 para não contar o próprio usuário
-            }
-        }
-
-        function ganharXP(quantidade) {
-            xp += quantidade;
-            const barra = document.getElementById('vip-progress');
-            const badge = document.getElementById('vip-badge');
-            if (barra) barra.style.width = (xp % 100) + "%";
-            if (badge) {
-                if (xp >= 300) { badge.innerText = "Bahia VIP"; badge.style.background = "var(--primary)"; }
-                else if (xp >= 200) { badge.innerText = "Ouro"; badge.style.background = "var(--gold)"; }
-                else if (xp >= 100) { badge.innerText = "Prata"; badge.style.background = "var(--silver)"; }
-                else { badge.innerText = "Bronze"; badge.style.background = "var(--bronze)"; }
-            }
-        }
-
-        // --- SISTEMA ADMIN (GOD MODE) - VERSÃO CORRIGIDA ---
         let cliquesSecretos = 0;
-
         function ativarAdmin() {
             cliquesSecretos++;
             if (cliquesSecretos === 5) {
-                const senha = prompt("🔒 ACESSO RESTRITO\nDigite a Senha Mestra:");
-                if (senha === "wrdd777") { // SUA SENHA
-                    alert("BEM VINDO, CHEFE! 🕶️");
-                    mudarPagina('admin', '');
-                    carregarPainelAdmin();
-                } else {
-                    alert("Acesso Negado.");
-                }
+                const s = prompt("🔒 SENHA:");
+                if (s === "wrdd777") { mudarPagina('admin', ''); carregarPainelAdmin(); }
                 cliquesSecretos = 0;
             }
         }
 
-        // --- SISTEMA ADMIN COMPLETO (COM APROVAÇÃO DE DEPÓSITOS) ---
+        // Suas funções admin continuam aqui... (carregarPainelAdmin, aprovarDepositoAdmin, etc)
 
+        // --- SISTEMA ADMIN COMPLETO (SÓ O DONO ACESSA) ---
         async function carregarPainelAdmin() {
             const lista = document.getElementById('admin-user-list');
             lista.innerHTML = "<p style='text-align:center'>Buscando dados...</p>";
 
-            // 1. CARREGA DEPÓSITOS PENDENTES
-            const { data: depositos } = await supabaseClient
-                .from('transacoes')
-                .select('*')
-                .eq('tipo', 'deposito')
-                .eq('status', 'pendente');
+            const { data: depositos } = await supabaseClient.from('transacoes').select('*').eq('tipo', 'deposito').eq('status', 'pendente');
+            const { data: usuarios } = await supabaseClient.from('usuarios').select('*').order('saldo', { ascending: false });
 
-            // 2. CARREGA USUÁRIOS
-            const { data: usuarios } = await supabaseClient
-                .from('usuarios')
-                .select('*')
-                .order('saldo', { ascending: false });
+            lista.innerHTML = "";
 
-            lista.innerHTML = ""; // Limpa a tela
-
-            // --- BLOCO: DEPÓSITOS PENDENTES ---
+            // Bloco de Depósitos Pendentes
             if (depositos && depositos.length > 0) {
-                const titulo = document.createElement('h4');
-                titulo.style.cssText = "color:var(--green); text-align:center; margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:5px;";
-                titulo.innerText = "💰 DEPÓSITOS AGUARDANDO";
-                lista.appendChild(titulo);
-
+                lista.innerHTML += `<h4 style="color:var(--green); text-align:center;">💰 DEPÓSITOS PENDENTES</h4>`;
                 depositos.forEach(dep => {
                     const div = document.createElement('div');
                     div.style.cssText = "background:rgba(0,255,0,0.05); padding:10px; border-radius:8px; border:1px solid var(--green); margin-bottom:10px; font-size:11px;";
                     div.innerHTML = `
-                    <div style="display:flex; justify-content:space-between;">
-                        <span>Usuário: <b>${dep.usuario}</b></span>
-                        <span style="color:var(--green); font-weight:bold;">R$ ${dep.valor.toFixed(2)}</span>
-                    </div>
-                    <div style="margin-top:8px; display:flex; gap:5px;">
-                        <button onclick="aprovarDepositoAdmin(${dep.id}, '${dep.usuario}', ${dep.valor})" style="flex:1; background:var(--green); border:none; padding:8px; border-radius:4px; font-weight:900; cursor:pointer;">APROVAR</button>
-                        <button onclick="rejeitarTransacao(${dep.id})" style="width:30px; background:var(--red); border:none; border-radius:4px; cursor:pointer; color:white;">✕</button>
-                    </div>
-                `;
+                        <div style="display:flex; justify-content:space-between;">
+                            <span>User: <b>${dep.usuario}</b></span>
+                            <span style="color:var(--green);">R$ ${dep.valor.toFixed(2)}</span>
+                        </div>
+                        <button onclick="aprovarDepositoAdmin(${dep.id}, '${dep.usuario}', ${dep.valor})" style="width:100%; background:var(--green); border:none; padding:8px; border-radius:4px; font-weight:900; margin-top:8px; cursor:pointer;">APROVAR AGORA</button>
+                    `;
                     lista.appendChild(div);
                 });
             }
 
-            // --- BLOCO: LISTA DE USUÁRIOS ---
-            const tituloUsers = document.createElement('h4');
-            tituloUsers.style.cssText = "color:white; text-align:center; margin:20px 0 10px 0; border-bottom:1px solid #333; padding-bottom:5px;";
-            tituloUsers.innerText = "GERENCIAR USUÁRIOS";
-            lista.appendChild(tituloUsers);
-
-            if (usuarios) {
-                usuarios.forEach(user => {
-                    const div = document.createElement('div');
-                    div.className = 'admin-user-card';
-
-                    let txtBan = "BANIR"; let corBan = "var(--red)";
-                    if (user.banido) {
-                        div.style.borderLeftColor = "var(--red)";
-                        div.style.opacity = "0.6";
-                        txtBan = "DESBANIR"; corBan = "var(--green)";
-                    }
-
-                    div.innerHTML = `
-                    <div>
-                        <b style="color:white; font-size:12px;">${user.username}</b>
-                        <br>Saldo: <span style="color:var(--green)">R$ ${user.saldo.toFixed(2)}</span>
-                    </div>
+            // Bloco de Gestão de Usuários
+            lista.innerHTML += `<h4 style="color:white; text-align:center; margin-top:20px;">👥 GESTÃO DE PLAYERS</h4>`;
+            usuarios.forEach(user => {
+                const div = document.createElement('div');
+                div.className = 'admin-user-card';
+                div.innerHTML = `
+                    <div><b>${user.username}</b><br>Saldo: R$ ${user.saldo.toFixed(2)}</div>
                     <div>
                         <button onclick="editarSaldoAdmin('${user.username}')" class="admin-btn" style="background:var(--primary); color:white;">💰</button>
-                        <button onclick="banirUsuarioAdmin('${user.username}', ${user.banido})" class="admin-btn" style="background:${corBan}; color:white; width:70px;">${txtBan}</button>
+                        <button onclick="banirUsuarioAdmin('${user.username}', ${user.banido})" class="admin-btn" style="background:${user.banido ? 'var(--green)' : 'var(--red)'}; color:white;">${user.banido ? 'SOLTAR' : 'BANIR'}</button>
                     </div>
                 `;
-                    lista.appendChild(div);
-                });
-            }
+                lista.appendChild(div);
+            });
         }
 
-        async function editarSaldoAdmin(username) {
-            const novoValor = prompt(`💰 Digite o novo saldo para ${username}:`);
-            if (novoValor !== null) {
-                const valorFloat = parseFloat(novoValor);
-                if (isNaN(valorFloat)) return alert("Valor inválido!");
-
-                const { error } = await supabaseClient
-                    .from('usuarios')
-                    .update({ saldo: valorFloat })
-                    .eq('username', username);
-
-                if (!error) {
-                    alert("Saldo atualizado!");
-                    carregarPainelAdmin();
-                } else {
-                    alert("Erro ao atualizar.");
-                }
-            }
-        }
-
-        
-
-        // --- FUNÇÕES NOVAS DE APROVAÇÃO ---
-        async function aprovarDepositoAdmin(idTransacao, username, valor) {
-            if (!confirm(`Confirma que recebeu R$ ${valor} de ${username} no banco?`)) return;
-
-            // 1. Pega saldo atual
+        async function aprovarDepositoAdmin(id, username, valor) {
+            if (!confirm(`Confirmar R$ ${valor} para ${username}?`)) return;
             const { data: user } = await supabaseClient.from('usuarios').select('saldo').eq('username', username).single();
-            if (!user) return alert("Usuário não encontrado!");
-
-            // 2. Soma o saldo
-            const novoSaldo = user.saldo + valor;
-            await supabaseClient.from('usuarios').update({ saldo: novoSaldo }).eq('username', username);
-
-            // 3. Marca como aprovado
-            await supabaseClient.from('transacoes').update({ status: 'aprovado' }).eq('id', idTransacao);
-
-            alert("✅ Saldo creditado com sucesso!");
-            carregarPainelAdmin();
+            await supabaseClient.from('usuarios').update({ saldo: user.saldo + valor }).eq('username', username);
+            await supabaseClient.from('transacoes').update({ status: 'aprovado' }).eq('id', id);
+            alert("Saldo Creditado!"); carregarPainelAdmin();
         }
 
-        async function rejeitarTransacao(id) {
-            if (!confirm("Rejeitar este depósito?")) return;
-            await supabaseClient.from('transacoes').update({ status: 'rejeitado' }).eq('id', id);
-            carregarPainelAdmin();
-        }
-
-        async function banirUsuarioAdmin(username, estadoAtual) {
-            const acao = estadoAtual ? "DESBANIR" : "BANIR";
-            if (!confirm(`Tem certeza que deseja ${acao} o usuário ${username}?`)) return;
-
-            const { error } = await supabaseClient
-                .from('usuarios')
-                .update({ banido: !estadoAtual })
-                .eq('username', username);
-
-            if (!error) {
+        async function editarSaldoAdmin(u) {
+            const v = prompt(`Novo saldo para ${u}:`);
+            if (v !== null) {
+                await supabaseClient.from('usuarios').update({ saldo: parseFloat(v) }).eq('username', u);
                 carregarPainelAdmin();
-            } else {
-                alert("Erro! Verifique a coluna 'banido' no Supabase.");
             }
         }
 
+        async function banirUsuarioAdmin(u, status) {
+            if (!confirm(`Mudar status de ${u}?`)) return;
+            await supabaseClient.from('usuarios').update({ banido: !status }).eq('username', u);
+            carregarPainelAdmin();
+        }
     </script>
 </body>
 </html>
