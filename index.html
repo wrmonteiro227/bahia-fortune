@@ -725,7 +725,7 @@
                 <button onclick="mudarPagina('withdraw', 'nav-prof')" style="flex:1; background:var(--primary); color:white; border:none; padding:15px; border-radius:8px; font-weight:900;">SAQUE</button>
             </div>
             <button onclick="mudarPagina('extract', 'nav-prof')" style="width:100%; background:transparent; border:1px solid #333; color:white; padding:15px; border-radius:8px; font-weight:900; margin-top:15px;">🕒 VER EXTRATO</button>
-            <button onclick="location.reload()" style="margin-top:30px; background:none; border:1px solid red; color:red; padding:10px 30px; border-radius:5px; font-weight:900;">SAIR</button>
+            <button onclick="logout()" style="margin-top:30px; background:none; border:1px solid red; color:red; padding:10px 30px; border-radius:5px; font-weight:900; cursor:pointer;">SAIR</button>
         </div>
     </main>
 
@@ -851,6 +851,47 @@
 
         let saldo = 0; let isLogged = false; let modoAuth = 'login'; let xp = 0; let transacoes = []; let notificacoes = []; let currentBanner = 0;
         const names = ["A***_bet", "Lu***_77", "Sorte***", "Baiano***", "Bet***"];
+
+        function alternarAuth() {
+            const titulo = document.getElementById('auth-title');
+            const btn = document.getElementById('btn-auth-main');
+            const toggle = document.getElementById('toggle-auth');
+            const groupCpf = document.getElementById('group-cpf');
+            const groupEmail = document.getElementById('group-email');
+
+            if (modoAuth === 'login') {
+                modoAuth = 'cadastro';
+                titulo.innerText = "CRIE SUA CONTA";
+                btn.innerText = "CADASTRAR NA BANCA";
+                toggle.innerHTML = 'Já tem conta? <span style="color: var(--primary); font-weight: 900;">FAÇA LOGIN</span>';
+
+                // Mostra os campos de cadastro
+                groupCpf.style.display = 'block';
+                groupEmail.style.display = 'block';
+            } else {
+                modoAuth = 'login';
+                titulo.innerText = "ACESSE SUA CONTA";
+                btn.innerText = "ENTRAR NA BANCA";
+                toggle.innerHTML = 'Não tem conta? <span style="color: var(--primary); font-weight: 900;">CADASTRE-SE AQUI</span>';
+
+                // Esconde os campos extras
+                groupCpf.style.display = 'none';
+                groupEmail.style.display = 'none';
+            }
+        }
+
+        // --- FUNÇÃO CORRIGIDA DE LOGOUT ---
+        function logout() {
+            // 1. Remove os dados salvos no navegador
+            localStorage.removeItem('bahia_user');
+
+            // 2. Reseta as variáveis locais
+            isLogged = false;
+            saldo = 0;
+
+            // 3. Recarrega a página (agora sem o dado salvo, ele vai ficar na tela de login)
+            location.reload();
+        }
 
         // --- NOVO: FUNÇÃO DE NOTIFICAÇÃO ESTILIZADA ---
         function notificarErro(msg) {
